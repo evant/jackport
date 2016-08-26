@@ -65,7 +65,7 @@ public class BackportJava8BasePlugin extends SchedAnnotationProcessorBasedPlugin
     @Override
     public List<Class<? extends RunnableSchedulable<? extends Component>>> getSortedRunners() {
         return Collections.<Class<? extends RunnableSchedulable<? extends Component>>>
-                singletonList(BackportObjectsMethods.class);
+                singletonList(BackportBaseClasses.class);
     }
 
     @Nonnull
