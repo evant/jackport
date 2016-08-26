@@ -1,0 +1,1 @@
+include ':app', ':jackport-java8-base-plugin', ':jackport-java8-base'
