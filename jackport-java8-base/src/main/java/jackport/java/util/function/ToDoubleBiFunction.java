@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -27,24 +28,27 @@ package jackport.java.util.function;
 import jackport.java.lang.FunctionalInterface;
 
 /**
- * Represents a supplier of results.
- *
- * <p>There is no requirement that a new or distinct result be returned each
- * time the supplier is invoked.
+ * Represents a function that accepts two arguments and produces a double-valued
+ * result.  This is the {@code double}-producing primitive specialization for
+ * {@link BiFunction}.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
+ * whose functional method is {@link #applyAsDouble(Object, Object)}.
  *
- * @param <T> the type of results supplied by this supplier
+ * @param <T> the type of the first argument to the function
+ * @param <U> the type of the second argument to the function
+ * @see BiFunction
  * @since 1.8
  */
 @FunctionalInterface
-public interface Supplier<T> {
-
+public interface ToDoubleBiFunction<T, U> {
+   
     /**
-     * Gets a result.
+     * Applies this function to the given arguments.
      *
-     * @return a result
+     * @param t the first function argument
+     * @param u the second function argument
+     * @return the function result
      */
-    T get();
+    double applyAsDouble(T t, U u);
 }

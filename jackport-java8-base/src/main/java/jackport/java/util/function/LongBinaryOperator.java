@@ -27,24 +27,25 @@ package jackport.java.util.function;
 import jackport.java.lang.FunctionalInterface;
 
 /**
- * Represents a supplier of results.
- *
- * <p>There is no requirement that a new or distinct result be returned each
- * time the supplier is invoked.
+ * Represents an operation upon two {@code long}-valued operands and producing a
+ * {@code long}-valued result.   This is the primitive type specialization of
+ * {@link BinaryOperator} for {@code long}.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
+ * whose functional method is {@link #applyAsLong(long, long)}.
  *
- * @param <T> the type of results supplied by this supplier
+ * @see BinaryOperator
+ * @see LongUnaryOperator
  * @since 1.8
  */
 @FunctionalInterface
-public interface Supplier<T> {
-
+public interface LongBinaryOperator {
     /**
-     * Gets a result.
+     * Applies this operator to the given operands.
      *
-     * @return a result
+     * @param left  the first operand
+     * @param right the second operand
+     * @return the operator result
      */
-    T get();
+    long applyAsLong(long left, long right);
 }

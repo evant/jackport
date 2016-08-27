@@ -27,24 +27,25 @@ package jackport.java.util.function;
 import jackport.java.lang.FunctionalInterface;
 
 /**
- * Represents a supplier of results.
+ * Represents a supplier of {@code double}-valued results.  This is the
+ * {@code double}-producing primitive specialization of {@link Supplier}.
  *
- * <p>There is no requirement that a new or distinct result be returned each
+ * <p>There is no requirement that a distinct result be returned each
  * time the supplier is invoked.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
+ * whose functional method is {@link #getAsDouble()}.
  *
- * @param <T> the type of results supplied by this supplier
+ * @see Supplier
  * @since 1.8
  */
 @FunctionalInterface
-public interface Supplier<T> {
-
+public interface DoubleSupplier {
+   
     /**
      * Gets a result.
      *
      * @return a result
      */
-    T get();
+    double getAsDouble();
 }

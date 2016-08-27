@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -27,24 +28,24 @@ package jackport.java.util.function;
 import jackport.java.lang.FunctionalInterface;
 
 /**
- * Represents a supplier of results.
- *
- * <p>There is no requirement that a new or distinct result be returned each
- * time the supplier is invoked.
+ * Represents a function that produces a double-valued result.  This is the
+ * {@code double}-producing primitive specialization for {@link Function}.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
+ * whose functional method is {@link #applyAsDouble(Object)}.
  *
- * @param <T> the type of results supplied by this supplier
+ * @param <T> the type of the input to the function
+ * @see Function
  * @since 1.8
  */
 @FunctionalInterface
-public interface Supplier<T> {
-
+public interface ToDoubleFunction<T> {
+   
     /**
-     * Gets a result.
+     * Applies this function to the given argument.
      *
-     * @return a result
+     * @param value the function argument
+     * @return the function result
      */
-    T get();
+    double applyAsDouble(T value);
 }

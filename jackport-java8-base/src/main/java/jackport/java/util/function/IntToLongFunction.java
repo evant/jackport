@@ -27,24 +27,24 @@ package jackport.java.util.function;
 import jackport.java.lang.FunctionalInterface;
 
 /**
- * Represents a supplier of results.
- *
- * <p>There is no requirement that a new or distinct result be returned each
- * time the supplier is invoked.
+ * Represents a function that accepts an int-valued argument and produces a
+ * long-valued result.  This is the {@code int}-to-{@code long} primitive
+ * specialization for {@link Function}.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
+ * whose functional method is {@link #applyAsLong(int)}.
  *
- * @param <T> the type of results supplied by this supplier
+ * @see Function
  * @since 1.8
  */
 @FunctionalInterface
-public interface Supplier<T> {
-
+public interface IntToLongFunction {
+   
     /**
-     * Gets a result.
+     * Applies this function to the given argument.
      *
-     * @return a result
+     * @param value the function argument
+     * @return the function result
      */
-    T get();
+    long applyAsLong(int value);
 }

@@ -1,19 +1,22 @@
 package me.tatarka.jackport;
 
+import com.android.jack.ir.ast.JClassLiteral;
 import com.android.jack.ir.ast.JClassOrInterface;
 import com.android.jack.ir.ast.JDefinedClassOrInterface;
+import com.android.jack.ir.ast.JInterface;
+import com.android.jack.ir.ast.JLambda;
+import com.android.jack.ir.ast.JMethod;
 import com.android.jack.ir.ast.JMethodCall;
 import com.android.jack.ir.ast.JPackage;
 import com.android.jack.ir.ast.JVisitor;
 import com.android.jack.transformations.request.TransformationRequest;
 import com.android.jack.transformations.request.TransformationStep;
+import com.android.sched.item.Component;
 import com.android.sched.item.Description;
 import com.android.sched.schedulable.Produce;
 import com.android.sched.schedulable.RunnableSchedulable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -21,11 +24,10 @@ import javax.annotation.Nonnull;
 @Produce(BackportJava8Api.class)
 public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrInterface> {
 
-    private static List<String> CLASSES = Arrays.asList(
+    private static String[][] CLASSES = classes(
             "java.lang.FunctionalInterface",
             "java.util.Objects",
-            "java.util.function.Predicate",
-            "java.util.function.Supplier"
+            "java.util.function.*"
     );
 
     private ArrayList<String> seen = new ArrayList<>();
@@ -36,8 +38,17 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
         type.traverse(new JVisitor() {
             @Override
             public boolean visit(@Nonnull final JDefinedClassOrInterface type) {
-                process(type, tr);
+                process(type.getSuperClass(), tr);
+                for (JInterface interfaceType : type.getImplements()) {
+                    process(interfaceType, tr);
+                }
                 return super.visit(type);
+            }
+
+            @Override
+            public boolean visit(@Nonnull JMethod method) {
+                process(method.getType(), tr);
+                return super.visit(method);
             }
 
             @Override
@@ -45,31 +56,83 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
                 process(methodCall.getReceiverType(), tr);
                 return super.visit(methodCall);
             }
+
+            @Override
+            public boolean visit(@Nonnull JLambda lambda) {
+                process(lambda.getType(), tr);
+                return super.visit(lambda);
+            }
+
+            @Override
+            public boolean visit(@Nonnull JClassLiteral classLiteral) {
+                process(classLiteral.getRefType(), tr);
+                return super.visit(classLiteral);
+            }
         });
         tr.commit();
     }
 
-    private void process(final JClassOrInterface type, TransformationRequest tr) {
-        if (checkClass(type)) {
+    private void process(final Component type, TransformationRequest tr) {
+        if (checkType(type)) {
             tr.append(new TransformationStep() {
                 @Override
                 public void apply() throws UnsupportedOperationException {
-                    type.setEnclosingPackage(withJackport(type.getEnclosingPackage()));
+                    changePackage((JClassOrInterface) type);
                 }
             });
         }
     }
 
-    private boolean checkClass(JClassOrInterface type) {
-        String className = type.getEnclosingPackage().toString() + "." + type.getName();
+    private boolean checkType(Component component) {
+        if (!(component instanceof JClassOrInterface)) {
+            return false;
+        }
+        JClassOrInterface type = (JClassOrInterface) component;
+        String className = className(type);
         if (seen.contains(className)) {
             return false;
         }
-        boolean result = CLASSES.contains(className);
+        boolean result = classMatches(className);
         if (result) {
             seen.add(className);
         }
         return result;
+    }
+
+    private void changePackage(JClassOrInterface type) {
+        String oldName = className(type);
+        type.setEnclosingPackage(withJackport(type.getEnclosingPackage()));
+        String newName = className(type);
+        System.out.println(oldName + " -> " + newName);
+    }
+
+    private static String[][] classes(String... args) {
+        String[][] result = new String[args.length][];
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            result[i] = arg.split("\\.");
+        }
+        return result;
+    }
+
+    private static boolean classMatches(String targetClassName) {
+        String[] targetParts = targetClassName.split("\\.");
+        loop:
+        for (String[] classParts : CLASSES) {
+            if (targetParts.length != classParts.length) {
+                continue;
+            }
+            for (int i = 0; i < classParts.length; i++) {
+                if (classParts[i].equals("*")) {
+                    continue;
+                }
+                if (!targetParts[i].equals(classParts[i])) {
+                    continue loop;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private static JPackage withJackport(JPackage jPackage) {
@@ -78,5 +141,12 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
         } else {
             return new JPackage(jPackage.getName(), withJackport(jPackage.getEnclosingPackage()));
         }
+    }
+
+    private static String className(JClassOrInterface type) {
+        if (type == null) {
+            return null;
+        }
+        return type.getEnclosingPackage().toString() + "." + type.getName();
     }
 }

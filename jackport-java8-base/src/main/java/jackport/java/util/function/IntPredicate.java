@@ -28,26 +28,27 @@ import jackport.java.lang.FunctionalInterface;
 import jackport.java.util.Objects;
 
 /**
- * Represents a predicate (boolean-valued function) of one argument.
+ * Represents a predicate (boolean-valued function) of one {@code int}-valued
+ * argument. This is the {@code int}-consuming primitive type specialization of
+ * {@link Predicate}.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #test(Object)}.
+ * whose functional method is {@link #test(int)}.
  *
- * @param <T> the type of the input to the predicate
- *
+ * @see Predicate
  * @since 1.8
  */
 @FunctionalInterface
-public interface Predicate<T> {
+public interface IntPredicate {
 
     /**
      * Evaluates this predicate on the given argument.
      *
-     * @param t the input argument
+     * @param value the input argument
      * @return {@code true} if the input argument matches the predicate,
      * otherwise {@code false}
      */
-    boolean test(T t);
+    boolean test(int value);
 
     class $ {
 
@@ -67,12 +68,12 @@ public interface Predicate<T> {
          * AND of this predicate and the {@code other} predicate
          * @throws NullPointerException if other is null
          */
-        public static <T> Predicate<T> and(final Predicate<T> $this, final Predicate<? super T> other) {
+        public static IntPredicate and(final IntPredicate $this, final IntPredicate other) {
             Objects.requireNonNull(other);
-            return new Predicate<T>() {
+            return new IntPredicate() {
                 @Override
-                public boolean test(T t) {
-                    return $this.test(t) && other.test(t);
+                public boolean test(int value) {
+                    return $this.test(value) && other.test(value);
                 }
             };
         }
@@ -84,11 +85,11 @@ public interface Predicate<T> {
          * @return a predicate that represents the logical negation of this
          * predicate
          */
-        public static <T> Predicate<T> negate(final Predicate<T> $this) {
-            return new Predicate<T>() {
+        public static IntPredicate negate(final IntPredicate $this) {
+            return new IntPredicate() {
                 @Override
-                public boolean test(T t) {
-                    return !$this.test(t);
+                public boolean test(int value) {
+                    return !$this.test(value);
                 }
             };
         }
@@ -109,38 +110,12 @@ public interface Predicate<T> {
          * OR of this predicate and the {@code other} predicate
          * @throws NullPointerException if other is null
          */
-        public static <T> Predicate<T> or(final Predicate<T> $this, final Predicate<? super T> other) {
+        public static IntPredicate or(final IntPredicate $this, final IntPredicate other) {
             Objects.requireNonNull(other);
-            return new Predicate<T>() {
+            return new IntPredicate() {
                 @Override
-                public boolean test(T t) {
-                    return $this.test(t) || other.test(t);
-                }
-            };
-        }
-
-        /**
-         * Returns a predicate that tests if two arguments are equal according
-         * to {@link Objects#equals(Object, Object)}.
-         *
-         * @param <T> the type of arguments to the predicate
-         * @param targetRef the object reference with which to compare for equality,
-         *               which may be {@code null}
-         * @return a predicate that tests if two arguments are equal according
-         * to {@link Objects#equals(Object, Object)}
-         */
-        public static <T> Predicate<T> isEqual(final Object targetRef) {
-            return (null == targetRef)
-                    ? (Predicate<T>) new Predicate<T>() {
-                @Override
-                public boolean test(T obj) {
-                    return Objects.isNull(obj);
-                }
-            }
-                    : new Predicate<T>() {
-                @Override
-                public boolean test(T object) {
-                    return targetRef.equals(object);
+                public boolean test(int value) {
+                    return $this.test(value) || other.test(value);
                 }
             };
         }

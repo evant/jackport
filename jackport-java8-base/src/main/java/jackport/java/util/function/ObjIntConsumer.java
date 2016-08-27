@@ -27,24 +27,27 @@ package jackport.java.util.function;
 import jackport.java.lang.FunctionalInterface;
 
 /**
- * Represents a supplier of results.
- *
- * <p>There is no requirement that a new or distinct result be returned each
- * time the supplier is invoked.
+ * Represents an operation that accepts an object-valued and a
+ * {@code int}-valued argument, and returns no result.  This is the
+ * {@code (reference, int)} specialization of {@link BiConsumer}.
+ * Unlike most other functional interfaces, {@code ObjIntConsumer} is
+ * expected to operate via side-effects.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #get()}.
+ * whose functional method is {@link #accept(Object, int)}.
  *
- * @param <T> the type of results supplied by this supplier
+ * @param <T> the type of the object argument to the operation
+ * @see BiConsumer
  * @since 1.8
  */
 @FunctionalInterface
-public interface Supplier<T> {
-
+public interface ObjIntConsumer<T> {
+   
     /**
-     * Gets a result.
+     * Performs this operation on the given arguments.
      *
-     * @return a result
+     * @param t     the first input argument
+     * @param value the second input argument
      */
-    T get();
+    void accept(T t, int value);
 }
