@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 public class MainActivity extends Activity {
 

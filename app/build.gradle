@@ -17,7 +17,7 @@ dependencies {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '24.0.2'
     defaultConfig {
         applicationId 'me.tatarka.jackport'
         minSdkVersion 10
@@ -28,9 +28,7 @@ android {
         jackOptions {
             enabled true
             jackInProcess false
-            pluginPath configurations.jackPlugin.filter {
-                it.toString().contains('jackport-java8-base-plugin.jar')
-            }.files
+            pluginPath configurations.jackPlugin.files
             plugin 'me.tatarka.jackport.BackportJava8BasePlugin'
         }
     }
@@ -39,5 +37,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+}
+
+tasks.all { task ->
+    if (task.name.matches('compile.*Sources')) {
+        task.dependsOn configurations.jackPlugin.buildDependencies
     }
 }
