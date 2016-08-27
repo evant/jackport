@@ -8,11 +8,11 @@ import org.junit.runner.RunWith;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import jackport.java.util.function.BiPredicate;
 
 /**
  * Test different ways to access classes that are backported. Note: since a single backport will
@@ -23,17 +23,17 @@ public class BackportBaseTest {
 
     @Test
     public void method_call() {
-        Objects.equals(1, 1);
+        Objects.equals(1, 2);
     }
 
     @Test
     public void method_return() {
         getSupplier();
     }
-    
+
     @Test
     public void method_arg() {
-        takeBiPredicate(new MyBiPredicate());
+        takeBiPredicate(null);
     }
 
     @Test
@@ -61,10 +61,15 @@ public class BackportBaseTest {
         Function<String, String> f = s -> s + "test";
     }
 
+    @Test
+    public void static_method_in_interface() {
+        IntUnaryOperator ident = IntUnaryOperator.identity();
+    }
+
     private static Supplier<String> getSupplier() {
         return null;
     }
-    
+
     private static void takeBiPredicate(BiPredicate<String, String> pr) {
     }
 
@@ -72,13 +77,6 @@ public class BackportBaseTest {
         @Override
         public boolean test(String s) {
             return true;
-        }
-    }
-    
-    private static class MyBiPredicate implements BiPredicate<String, String> {
-        @Override
-        public boolean test(String s, String s2) {
-            return false;
         }
     }
 }

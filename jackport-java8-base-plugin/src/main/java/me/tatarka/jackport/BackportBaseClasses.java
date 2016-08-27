@@ -8,10 +8,12 @@ import com.android.jack.ir.ast.JLambda;
 import com.android.jack.ir.ast.JMethod;
 import com.android.jack.ir.ast.JMethodCall;
 import com.android.jack.ir.ast.JPackage;
+import com.android.jack.ir.ast.JParameter;
+import com.android.jack.ir.ast.JPhantomClass;
+import com.android.jack.ir.ast.JType;
 import com.android.jack.ir.ast.JVisitor;
 import com.android.jack.transformations.request.TransformationRequest;
 import com.android.jack.transformations.request.TransformationStep;
-import com.android.sched.item.Component;
 import com.android.sched.item.Description;
 import com.android.sched.schedulable.Produce;
 import com.android.sched.schedulable.RunnableSchedulable;
@@ -38,52 +40,62 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
         type.traverse(new JVisitor() {
             @Override
             public boolean visit(@Nonnull final JDefinedClassOrInterface type) {
-                process(type.getSuperClass(), tr);
+                processChangePackage(type.getSuperClass(), tr);
                 for (JInterface interfaceType : type.getImplements()) {
-                    process(interfaceType, tr);
+                    processChangePackage(interfaceType, tr);
                 }
                 return super.visit(type);
             }
 
             @Override
             public boolean visit(@Nonnull JMethod method) {
-                process(method.getType(), tr);
+                processChangePackage(method.getType(), tr);
+                for (JParameter param : method.getParams()) {
+                    processChangePackage(param.getType(), tr);
+                }
                 return super.visit(method);
             }
 
             @Override
             public boolean visit(@Nonnull JMethodCall methodCall) {
-                process(methodCall.getReceiverType(), tr);
+                if (methodCall.getReceiverType() instanceof JInterface && methodCall.getDispatchKind() == JMethodCall.DispatchKind.DIRECT) {
+                    processStaticInterfaceMethod(methodCall, tr);
+                } else {
+                    processChangePackage(methodCall.getReceiverType(), tr);
+                }
                 return super.visit(methodCall);
             }
 
             @Override
             public boolean visit(@Nonnull JLambda lambda) {
-                process(lambda.getType(), tr);
+                processChangePackage(lambda.getType(), tr);
                 return super.visit(lambda);
             }
 
             @Override
             public boolean visit(@Nonnull JClassLiteral classLiteral) {
-                process(classLiteral.getRefType(), tr);
+                processChangePackage(classLiteral.getRefType(), tr);
                 return super.visit(classLiteral);
             }
         });
         tr.commit();
     }
 
-    private void process(final Component type, TransformationRequest tr) {
+    private void processChangePackage(JType type, TransformationRequest tr) {
         if (checkType(type)) {
-            tr.append(new TransformationStep() {
-                @Override
-                public void apply() throws UnsupportedOperationException {
-                    changePackage((JClassOrInterface) type);
-                }
-            });
+            tr.append(new ChangePackage((JClassOrInterface) type));
         }
     }
 
-    private boolean checkType(Component component) {
+    private void processStaticInterfaceMethod(JMethodCall call, TransformationRequest tr) {
+        JClassOrInterface type = call.getReceiverType();
+        if (checkType(type)) {
+            tr.append(new ChangePackage(type));
+            tr.append(new CallInterfaceStaticMethod(call));
+        }
+    }
+
+    private boolean checkType(JType component) {
         if (!(component instanceof JClassOrInterface)) {
             return false;
         }
@@ -97,13 +109,6 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
             seen.add(className);
         }
         return result;
-    }
-
-    private void changePackage(JClassOrInterface type) {
-        String oldName = className(type);
-        type.setEnclosingPackage(withJackport(type.getEnclosingPackage()));
-        String newName = className(type);
-        System.out.println(oldName + " -> " + newName);
     }
 
     private static String[][] classes(String... args) {
@@ -143,10 +148,56 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
         }
     }
 
+    private static class ChangePackage implements TransformationStep {
+        final JClassOrInterface type;
+
+        ChangePackage(JClassOrInterface type) {
+            this.type = type;
+        }
+
+        @Override
+        public void apply() throws UnsupportedOperationException {
+            String oldName = className(type);
+            type.setEnclosingPackage(withJackport(type.getEnclosingPackage()));
+            String newName = className(type);
+            System.out.println(oldName + " -> " + newName);
+        }
+    }
+
+    private static class CallInterfaceStaticMethod implements TransformationStep {
+        final JMethodCall call;
+
+        CallInterfaceStaticMethod(JMethodCall call) {
+            this.call = call;
+        }
+
+        @Override
+        public void apply() throws UnsupportedOperationException {
+            JClassOrInterface oldReceiver = call.getReceiverType();
+            JClassOrInterface newReceiver = new JPhantomClass(oldReceiver.getName() + "$$", oldReceiver.getEnclosingPackage());
+            JMethodCall newMethodCall = new JMethodCall(
+                    call.getSourceInfo(),
+                    call.getInstance(),
+                    newReceiver,
+                    call.getMethodId(),
+                    call.getType(),
+                    /*virtualDispatch=*/false);
+            call.getParent().replace(call, newMethodCall);
+            System.out.println(methodName(call) + " -> " + methodName(newMethodCall));
+        }
+    }
+
     private static String className(JClassOrInterface type) {
         if (type == null) {
             return null;
         }
         return type.getEnclosingPackage().toString() + "." + type.getName();
+    }
+    
+    private static String methodName(JMethodCall call) {
+        if (call == null) {
+            return null;
+        }
+        return className(call.getReceiverType()) + "." + call.getMethodName();
     }
 }
