@@ -49,26 +49,71 @@ public interface LongPredicate {
      */
     boolean test(long value);
 
-    class $ {
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * AND of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code false}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ANDed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * AND of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * AND of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code false}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ANDed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * AND of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    LongPredicate and(LongPredicate other);
+
+    /**
+     * Returns a predicate that represents the logical negation of this
+     * predicate.
+     *
+     * @return a predicate that represents the logical negation of this
+     * predicate
+     */
+    LongPredicate negate();
+
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * OR of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code true}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ORed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * OR of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    LongPredicate or(LongPredicate other);
+
+    abstract class $ implements LongPredicate {
+
+        @Override
+        public LongPredicate and(LongPredicate other) {
+            return $.and(this, other);
+        }
+
+        @Override
+        public LongPredicate negate() {
+            return $.negate(this);
+        }
+
+        @Override
+        public LongPredicate or(LongPredicate other) {
+            return $.or(this, other);
+        }
+
         public static LongPredicate and(final LongPredicate $this, final LongPredicate other) {
             Objects.requireNonNull(other);
-            return new LongPredicate() {
+            return new $() {
                 @Override
                 public boolean test(long value) {
                     return $this.test(value) && other.test(value);
@@ -76,15 +121,8 @@ public interface LongPredicate {
             };
         }
 
-        /**
-         * Returns a predicate that represents the logical negation of this
-         * predicate.
-         *
-         * @return a predicate that represents the logical negation of this
-         * predicate
-         */
         public static LongPredicate negate(final LongPredicate $this) {
-            return new LongPredicate() {
+            return new $() {
                 @Override
                 public boolean test(long value) {
                     return !$this.test(value);
@@ -92,25 +130,9 @@ public interface LongPredicate {
             };
         }
 
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * OR of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code true}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ORed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * OR of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
         public static LongPredicate or(final LongPredicate $this, final LongPredicate other) {
             Objects.requireNonNull(other);
-            return new LongPredicate() {
+            return new $() {
                 @Override
                 public boolean test(long value) {
                     return $this.test(value) || other.test(value);

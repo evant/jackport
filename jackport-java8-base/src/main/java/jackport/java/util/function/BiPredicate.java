@@ -51,27 +51,71 @@ public interface BiPredicate<T, U> {
      */
     boolean test(T t, U u);
 
-    class $ {
-        
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * AND of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code false}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ANDed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * AND of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * AND of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code false}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ANDed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * AND of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    BiPredicate<T, U> and(BiPredicate<? super T, ? super U> other);
+
+    /**
+     * Returns a predicate that represents the logical negation of this
+     * predicate.
+     *
+     * @return a predicate that represents the logical negation of this
+     * predicate
+     */
+    BiPredicate<T, U> negate();
+
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * OR of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code true}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ORed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * OR of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    BiPredicate<T, U> or(BiPredicate<? super T, ? super U> other);
+
+    abstract class $<T, U> implements BiPredicate<T, U> {
+
+        @Override
+        public BiPredicate<T, U> and(BiPredicate<? super T, ? super U> other) {
+            return $.and(this, other);
+        }
+
+        @Override
+        public BiPredicate<T, U> negate() {
+            return $.negate(this);
+        }
+
+        @Override
+        public BiPredicate<T, U> or(BiPredicate<? super T, ? super U> other) {
+            return $.or(this, other);
+        }
+
         public static <T, U> BiPredicate<T, U> and(final BiPredicate<T, U> $this, final BiPredicate<? super T, ? super U> other) {
             Objects.requireNonNull(other);
-            return new BiPredicate<T, U>() {
+            return new $<T, U>() {
                 @Override
                 public boolean test(T t, U u) {
                     return $this.test(t, u) && other.test(t, u);
@@ -79,15 +123,8 @@ public interface BiPredicate<T, U> {
             };
         }
 
-        /**
-         * Returns a predicate that represents the logical negation of this
-         * predicate.
-         *
-         * @return a predicate that represents the logical negation of this
-         * predicate
-         */
         public static <T, U> BiPredicate<T, U> negate(final BiPredicate<T, U> $this) {
-            return new BiPredicate<T, U>() {
+            return new $<T, U>() {
                 @Override
                 public boolean test(T t, U u) {
                     return !$this.test(t, u);
@@ -95,25 +132,9 @@ public interface BiPredicate<T, U> {
             };
         }
 
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * OR of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code true}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ORed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * OR of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
         public static <T, U> BiPredicate<T, U> or(final BiPredicate<T, U> $this, final BiPredicate<? super T, ? super U> other) {
             Objects.requireNonNull(other);
-            return new BiPredicate<T, U>() {
+            return new $<T, U>() {
                 @Override
                 public boolean test(T t, U u) {
                     return $this.test(t, u) || other.test(t, u);

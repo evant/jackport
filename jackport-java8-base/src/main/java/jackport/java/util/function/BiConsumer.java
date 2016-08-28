@@ -51,24 +51,30 @@ public interface BiConsumer<T, U> {
      */
     void accept(T t, U u);
 
+    /**
+     * Returns a composed {@code BiConsumer} that performs, in sequence, this
+     * operation followed by the {@code after} operation. If performing either
+     * operation throws an exception, it is relayed to the caller of the
+     * composed operation.  If performing this operation throws an exception,
+     * the {@code after} operation will not be performed.
+     *
+     * @param after the operation to perform after this operation
+     * @return a composed {@code BiConsumer} that performs in sequence this
+     * operation followed by the {@code after} operation
+     * @throws NullPointerException if {@code after} is null
+     */
+    BiConsumer<T, U> andThen(BiConsumer<? super T, ? super U> after);
 
-    class $ {
-        
-        /**
-         * Returns a composed {@code BiConsumer} that performs, in sequence, this
-         * operation followed by the {@code after} operation. If performing either
-         * operation throws an exception, it is relayed to the caller of the
-         * composed operation.  If performing this operation throws an exception,
-         * the {@code after} operation will not be performed.
-         *
-         * @param after the operation to perform after this operation
-         * @return a composed {@code BiConsumer} that performs in sequence this
-         * operation followed by the {@code after} operation
-         * @throws NullPointerException if {@code after} is null
-         */
+    abstract class $<T, U> implements BiConsumer<T, U> {
+
+        @Override
+        public BiConsumer<T, U> andThen(BiConsumer<? super T, ? super U> after) {
+            return $.andThen(this, after);
+        }
+
         public static <T, U> BiConsumer<T, U> andThen(final BiConsumer<T, U> $this, final BiConsumer<? super T, ? super U> after) {
             Objects.requireNonNull(after);
-            return new BiConsumer<T, U>() {
+            return new $<T, U>() {
                 @Override
                 public void accept(T l, U r) {
                     $this.accept(l, r);

@@ -51,27 +51,34 @@ public interface BiFunction<T, U, R> {
      */
     R apply(T t, U u);
 
+    /**
+     * Returns a composed function that first applies this function to
+     * its input, and then applies the {@code after} function to the result.
+     * If evaluation of either function throws an exception, it is relayed to
+     * the caller of the composed function.
+     *
+     * @param <V>   the type of output of the {@code after} function, and of the
+     *              composed function
+     * @param after the function to apply after this function is applied
+     * @return a composed function that first applies this function and then
+     * applies the {@code after} function
+     * @throws NullPointerException if after is null
+     */
+    <V> BiFunction<T, U, V> andThen(Function<? super R, ? extends V> after);
+
     class $ {
-        
-        /**
-         * Returns a composed function that first applies this function to
-         * its input, and then applies the {@code after} function to the result.
-         * If evaluation of either function throws an exception, it is relayed to
-         * the caller of the composed function.
-         *
-         * @param <V>   the type of output of the {@code after} function, and of the
-         *              composed function
-         * @param after the function to apply after this function is applied
-         * @return a composed function that first applies this function and then
-         * applies the {@code after} function
-         * @throws NullPointerException if after is null
-         */
+
         public static <T, U, R, V> BiFunction<T, U, V> andThen(final BiFunction<T, U, R> $this, final Function<? super R, ? extends V> after) {
             Objects.requireNonNull(after);
             return new BiFunction<T, U, V>() {
                 @Override
                 public V apply(T t, U u) {
                     return after.apply($this.apply(t, u));
+                }
+
+                @Override
+                public <V1> BiFunction<T, U, V1> andThen(Function<? super V, ? extends V1> after) {
+                    return $.andThen(this, after);
                 }
             };
         }

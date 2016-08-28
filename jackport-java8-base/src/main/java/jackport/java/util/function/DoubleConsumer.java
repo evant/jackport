@@ -49,23 +49,30 @@ public interface DoubleConsumer {
      */
     void accept(double value);
 
-    class $ {
-       
-        /**
-         * Returns a composed {@code DoubleConsumer} that performs, in sequence, this
-         * operation followed by the {@code after} operation. If performing either
-         * operation throws an exception, it is relayed to the caller of the
-         * composed operation.  If performing this operation throws an exception,
-         * the {@code after} operation will not be performed.
-         *
-         * @param after the operation to perform after this operation
-         * @return a composed {@code DoubleConsumer} that performs in sequence this
-         * operation followed by the {@code after} operation
-         * @throws NullPointerException if {@code after} is null
-         */
+    /**
+     * Returns a composed {@code DoubleConsumer} that performs, in sequence, this
+     * operation followed by the {@code after} operation. If performing either
+     * operation throws an exception, it is relayed to the caller of the
+     * composed operation.  If performing this operation throws an exception,
+     * the {@code after} operation will not be performed.
+     *
+     * @param after the operation to perform after this operation
+     * @return a composed {@code DoubleConsumer} that performs in sequence this
+     * operation followed by the {@code after} operation
+     * @throws NullPointerException if {@code after} is null
+     */
+    DoubleConsumer andThen(DoubleConsumer after);
+
+    abstract class $ implements DoubleConsumer {
+
+        @Override
+        public DoubleConsumer andThen(DoubleConsumer after) {
+            return $.andThen(this, after);
+        }
+
         public static DoubleConsumer andThen(final DoubleConsumer $this, final DoubleConsumer after) {
             Objects.requireNonNull(after);
-            return new DoubleConsumer() {
+            return new $() {
                 @Override
                 public void accept(double t) {
                     $this.accept(t);

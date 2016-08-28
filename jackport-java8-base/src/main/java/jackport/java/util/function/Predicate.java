@@ -34,7 +34,6 @@ import jackport.java.util.Objects;
  * whose functional method is {@link #test(Object)}.
  *
  * @param <T> the type of the input to the predicate
- *
  * @since 1.8
  */
 @FunctionalInterface
@@ -49,27 +48,71 @@ public interface Predicate<T> {
      */
     boolean test(T t);
 
-    class $ {
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * AND of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code false}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ANDed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * AND of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    Predicate<T> and(Predicate<? super T> other);
 
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * AND of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code false}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ANDed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * AND of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
+    /**
+     * Returns a predicate that represents the logical negation of this
+     * predicate.
+     *
+     * @return a predicate that represents the logical negation of this
+     * predicate
+     */
+    Predicate<T> negate();
+
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * OR of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code true}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ORed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * OR of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    Predicate<T> or(Predicate<? super T> other);
+
+    abstract class $<T> implements Predicate<T> {
+
+        @Override
+        public Predicate<T> and(Predicate<? super T> other) {
+            return $.and(this, other);
+        }
+
+        @Override
+        public Predicate<T> negate() {
+            return $.negate(this);
+        }
+
+        @Override
+        public Predicate<T> or(Predicate<? super T> other) {
+            return $.or(this, other);
+        }
+
         public static <T> Predicate<T> and(final Predicate<T> $this, final Predicate<? super T> other) {
             Objects.requireNonNull(other);
-            return new Predicate<T>() {
+            return new $<T>() {
                 @Override
                 public boolean test(T t) {
                     return $this.test(t) && other.test(t);
@@ -77,15 +120,8 @@ public interface Predicate<T> {
             };
         }
 
-        /**
-         * Returns a predicate that represents the logical negation of this
-         * predicate.
-         *
-         * @return a predicate that represents the logical negation of this
-         * predicate
-         */
         public static <T> Predicate<T> negate(final Predicate<T> $this) {
-            return new Predicate<T>() {
+            return new $<T>() {
                 @Override
                 public boolean test(T t) {
                     return !$this.test(t);
@@ -93,25 +129,9 @@ public interface Predicate<T> {
             };
         }
 
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * OR of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code true}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ORed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * OR of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
         public static <T> Predicate<T> or(final Predicate<T> $this, final Predicate<? super T> other) {
             Objects.requireNonNull(other);
-            return new Predicate<T>() {
+            return new $<T>() {
                 @Override
                 public boolean test(T t) {
                     return $this.test(t) || other.test(t);
@@ -123,21 +143,21 @@ public interface Predicate<T> {
          * Returns a predicate that tests if two arguments are equal according
          * to {@link Objects#equals(Object, Object)}.
          *
-         * @param <T> the type of arguments to the predicate
+         * @param <T>       the type of arguments to the predicate
          * @param targetRef the object reference with which to compare for equality,
-         *               which may be {@code null}
+         *                  which may be {@code null}
          * @return a predicate that tests if two arguments are equal according
          * to {@link Objects#equals(Object, Object)}
          */
         public static <T> Predicate<T> isEqual(final Object targetRef) {
             return (null == targetRef)
-                    ? (Predicate<T>) new Predicate<T>() {
+                    ? (Predicate<T>) new $<T>() {
                 @Override
                 public boolean test(T obj) {
                     return Objects.isNull(obj);
                 }
             }
-                    : new Predicate<T>() {
+                    : new $<T>() {
                 @Override
                 public boolean test(T object) {
                     return targetRef.equals(object);

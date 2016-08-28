@@ -49,30 +49,56 @@ public interface DoubleUnaryOperator {
      */
     double applyAsDouble(double operand);
 
-    class $ {
+    /**
+     * Returns a composed operator that first applies the {@code before}
+     * operator to its input, and then applies this operator to the result.
+     * If evaluation of either operator throws an exception, it is relayed to
+     * the caller of the composed operator.
+     *
+     * @param before the operator to apply before this operator is applied
+     * @return a composed operator that first applies the {@code before}
+     * operator and then applies this operator
+     * @throws NullPointerException if before is null
+     * @see #andThen(DoubleUnaryOperator)
+     */
+    DoubleUnaryOperator compose(DoubleUnaryOperator before);
 
-        private static final DoubleUnaryOperator IDENTITY = new DoubleUnaryOperator() {
+    /**
+     * Returns a composed operator that first applies this operator to
+     * its input, and then applies the {@code after} operator to the result.
+     * If evaluation of either operator throws an exception, it is relayed to
+     * the caller of the composed operator.
+     *
+     * @param after the operator to apply after this operator is applied
+     * @return a composed operator that first applies this operator and then
+     * applies the {@code after} operator
+     * @throws NullPointerException if after is null
+     * @see #compose(DoubleUnaryOperator)
+     */
+    DoubleUnaryOperator andThen(DoubleUnaryOperator after);
+
+    abstract class $ implements DoubleUnaryOperator {
+
+        private static final DoubleUnaryOperator IDENTITY = new $() {
             @Override
             public double applyAsDouble(double operand) {
                 return operand;
             }
         };
 
-        /**
-         * Returns a composed operator that first applies the {@code before}
-         * operator to its input, and then applies this operator to the result.
-         * If evaluation of either operator throws an exception, it is relayed to
-         * the caller of the composed operator.
-         *
-         * @param before the operator to apply before this operator is applied
-         * @return a composed operator that first applies the {@code before}
-         * operator and then applies this operator
-         * @throws NullPointerException if before is null
-         * @see #andThen(DoubleUnaryOperator, DoubleUnaryOperator)
-         */
+        @Override
+        public DoubleUnaryOperator compose(DoubleUnaryOperator before) {
+            return $.compose(this, before);
+        }
+
+        @Override
+        public DoubleUnaryOperator andThen(DoubleUnaryOperator after) {
+            return $.andThen(this, after);
+        }
+
         public static DoubleUnaryOperator compose(final DoubleUnaryOperator $this, final DoubleUnaryOperator before) {
             Objects.requireNonNull(before);
-            return new DoubleUnaryOperator() {
+            return new $() {
                 @Override
                 public double applyAsDouble(double v) {
                     return $this.applyAsDouble(before.applyAsDouble(v));
@@ -80,21 +106,9 @@ public interface DoubleUnaryOperator {
             };
         }
 
-        /**
-         * Returns a composed operator that first applies this operator to
-         * its input, and then applies the {@code after} operator to the result.
-         * If evaluation of either operator throws an exception, it is relayed to
-         * the caller of the composed operator.
-         *
-         * @param after the operator to apply after this operator is applied
-         * @return a composed operator that first applies this operator and then
-         * applies the {@code after} operator
-         * @throws NullPointerException if after is null
-         * @see #compose(DoubleUnaryOperator, DoubleUnaryOperator)
-         */
         public static DoubleUnaryOperator andThen(final DoubleUnaryOperator $this, final DoubleUnaryOperator after) {
             Objects.requireNonNull(after);
-            return new DoubleUnaryOperator() {
+            return new $() {
                 @Override
                 public double applyAsDouble(double t) {
                     return after.applyAsDouble($this.applyAsDouble(t));

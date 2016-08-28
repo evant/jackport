@@ -50,27 +50,71 @@ public interface IntPredicate {
      */
     boolean test(int value);
 
-    class $ {
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * AND of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code false}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ANDed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * AND of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    IntPredicate and(IntPredicate other);
 
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * AND of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code false}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ANDed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * AND of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
+    /**
+     * Returns a predicate that represents the logical negation of this
+     * predicate.
+     *
+     * @return a predicate that represents the logical negation of this
+     * predicate
+     */
+    IntPredicate negate();
+
+    /**
+     * Returns a composed predicate that represents a short-circuiting logical
+     * OR of this predicate and another.  When evaluating the composed
+     * predicate, if this predicate is {@code true}, then the {@code other}
+     * predicate is not evaluated.
+     *
+     * <p>Any exceptions thrown during evaluation of either predicate are relayed
+     * to the caller; if evaluation of this predicate throws an exception, the
+     * {@code other} predicate will not be evaluated.
+     *
+     * @param other a predicate that will be logically-ORed with this
+     *              predicate
+     * @return a composed predicate that represents the short-circuiting logical
+     * OR of this predicate and the {@code other} predicate
+     * @throws NullPointerException if other is null
+     */
+    IntPredicate or(IntPredicate other);
+
+    abstract class $ implements IntPredicate {
+
+        @Override
+        public IntPredicate and(IntPredicate other) {
+            return $.and(this, other);
+        }
+
+        @Override
+        public IntPredicate negate() {
+            return $.negate(this);
+        }
+
+        @Override
+        public IntPredicate or(IntPredicate other) {
+            return $.or(this, other);
+        }
+
         public static IntPredicate and(final IntPredicate $this, final IntPredicate other) {
             Objects.requireNonNull(other);
-            return new IntPredicate() {
+            return new $() {
                 @Override
                 public boolean test(int value) {
                     return $this.test(value) && other.test(value);
@@ -78,15 +122,8 @@ public interface IntPredicate {
             };
         }
 
-        /**
-         * Returns a predicate that represents the logical negation of this
-         * predicate.
-         *
-         * @return a predicate that represents the logical negation of this
-         * predicate
-         */
         public static IntPredicate negate(final IntPredicate $this) {
-            return new IntPredicate() {
+            return new $() {
                 @Override
                 public boolean test(int value) {
                     return !$this.test(value);
@@ -94,25 +131,9 @@ public interface IntPredicate {
             };
         }
 
-        /**
-         * Returns a composed predicate that represents a short-circuiting logical
-         * OR of this predicate and another.  When evaluating the composed
-         * predicate, if this predicate is {@code true}, then the {@code other}
-         * predicate is not evaluated.
-         *
-         * <p>Any exceptions thrown during evaluation of either predicate are relayed
-         * to the caller; if evaluation of this predicate throws an exception, the
-         * {@code other} predicate will not be evaluated.
-         *
-         * @param other a predicate that will be logically-ORed with this
-         *              predicate
-         * @return a composed predicate that represents the short-circuiting logical
-         * OR of this predicate and the {@code other} predicate
-         * @throws NullPointerException if other is null
-         */
         public static IntPredicate or(final IntPredicate $this, final IntPredicate other) {
             Objects.requireNonNull(other);
-            return new IntPredicate() {
+            return new $() {
                 @Override
                 public boolean test(int value) {
                     return $this.test(value) || other.test(value);

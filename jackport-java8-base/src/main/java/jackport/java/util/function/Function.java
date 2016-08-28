@@ -48,32 +48,60 @@ public interface Function<T, R> {
      */
     R apply(T t);
 
-    class $ {
+    /**
+     * Returns a composed function that first applies the {@code before}
+     * function to its input, and then applies this function to the result.
+     * If evaluation of either function throws an exception, it is relayed to
+     * the caller of the composed function.
+     *
+     * @param <V>    the type of input to the {@code before} function, and to the
+     *               composed function
+     * @param before the function to apply before this function is applied
+     * @return a composed function that first applies the {@code before}
+     * function and then applies this function
+     * @throws NullPointerException if before is null
+     * @see #andThen(Function)
+     */
+    <V> Function<V, R> compose(Function<? super V, ? extends T> before);
 
-        private static final Function IDENTITY = new Function() {
+    /**
+     * Returns a composed function that first applies this function to
+     * its input, and then applies the {@code after} function to the result.
+     * If evaluation of either function throws an exception, it is relayed to
+     * the caller of the composed function.
+     *
+     * @param <V>   the type of output of the {@code after} function, and of the
+     *              composed function
+     * @param after the function to apply after this function is applied
+     * @return a composed function that first applies this function and then
+     * applies the {@code after} function
+     * @throws NullPointerException if after is null
+     * @see #compose(Function)
+     */
+    <V> Function<T, V> andThen(Function<? super R, ? extends V> after);
+
+    abstract class $<T, R> implements Function<T, R> {
+
+        static final Function IDENTITY = new $() {
             @Override
             public Object apply(Object t) {
                 return t;
             }
         };
 
-        /**
-         * Returns a composed function that first applies the {@code before}
-         * function to its input, and then applies this function to the result.
-         * If evaluation of either function throws an exception, it is relayed to
-         * the caller of the composed function.
-         *
-         * @param <V>    the type of input to the {@code before} function, and to the
-         *               composed function
-         * @param before the function to apply before this function is applied
-         * @return a composed function that first applies the {@code before}
-         * function and then applies this function
-         * @throws NullPointerException if before is null
-         * @see #andThen(Function, Function)
-         */
+        @Override
+        public <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+            return $.compose(this, before);
+        }
+
+        @Override
+        public <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+            return $.andThen(this, after);
+        }
+
         public static <T, R, V> Function<V, R> compose(final Function<T, R> $this, final Function<? super V, ? extends T> before) {
             Objects.requireNonNull(before);
-            return new Function<V, R>() {
+            return new $<V, R>() {
                 @Override
                 public R apply(V v) {
                     return $this.apply(before.apply(v));
@@ -81,23 +109,9 @@ public interface Function<T, R> {
             };
         }
 
-        /**
-         * Returns a composed function that first applies this function to
-         * its input, and then applies the {@code after} function to the result.
-         * If evaluation of either function throws an exception, it is relayed to
-         * the caller of the composed function.
-         *
-         * @param <V>   the type of output of the {@code after} function, and of the
-         *              composed function
-         * @param after the function to apply after this function is applied
-         * @return a composed function that first applies this function and then
-         * applies the {@code after} function
-         * @throws NullPointerException if after is null
-         * @see #compose(Function, Function)
-         */
         public static <T, R, V> Function<T, V> andThen(final Function<T, R> $this, final Function<? super R, ? extends V> after) {
             Objects.requireNonNull(after);
-            return new Function<T, V>() {
+            return new $<T, V>() {
                 @Override
                 public V apply(T t) {
                     return after.apply($this.apply(t));

@@ -46,8 +46,13 @@ import jackport.java.util.Objects;
 @FunctionalInterface
 public interface BinaryOperator<T> extends BiFunction<T, T, T> {
 
-    class $ {
-        
+    abstract class $<T> implements BinaryOperator<T> {
+
+        @Override
+        public <V> BiFunction<T, T, V> andThen(Function<? super T, ? extends V> after) {
+            return BiFunction.$.andThen(this, after);
+        }
+
         /**
          * Returns a {@link BinaryOperator} which returns the lesser of two elements
          * according to the specified {@code Comparator}.
@@ -60,7 +65,7 @@ public interface BinaryOperator<T> extends BiFunction<T, T, T> {
          */
         public static <T> BinaryOperator<T> minBy(final Comparator<? super T> comparator) {
             Objects.requireNonNull(comparator);
-            return new BinaryOperator<T>() {
+            return new $<T>() {
                 @Override
                 public T apply(T a, T b) {
                     return comparator.compare(a, b) <= 0 ? a : b;
@@ -80,7 +85,7 @@ public interface BinaryOperator<T> extends BiFunction<T, T, T> {
          */
         public static <T> BinaryOperator<T> maxBy(final Comparator<? super T> comparator) {
             Objects.requireNonNull(comparator);
-            return new BinaryOperator<T>() {
+            return new $<T>() {
                 @Override
                 public T apply(T a, T b) {
                     return comparator.compare(a, b) >= 0 ? a : b;

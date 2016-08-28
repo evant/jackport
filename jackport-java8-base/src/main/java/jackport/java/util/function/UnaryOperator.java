@@ -41,9 +41,9 @@ import jackport.java.lang.FunctionalInterface;
 @FunctionalInterface
 public interface UnaryOperator<T> extends Function<T, T> {
 
-    class $ {
+    abstract class $<T> extends Function.$<T, T> implements UnaryOperator<T> {
 
-        private static final UnaryOperator IDENTITY = new UnaryOperator() {
+        private static final UnaryOperator IDENTITY = new UnaryOperator.$() {
             @Override
             public Object apply(Object t) {
                 return t;
