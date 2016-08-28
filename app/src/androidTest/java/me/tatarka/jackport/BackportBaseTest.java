@@ -12,11 +12,14 @@ import java.util.function.BiPredicate;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.IntToLongFunction;
 import java.util.function.IntUnaryOperator;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Test different ways to access classes that are backported. Note: since a single backport will
@@ -25,9 +28,21 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 public class BackportBaseTest {
 
+    private IntToLongFunction field;
+
+    @Test
+    public void field() {
+        assertNull(field);
+    }
+
+    @Test
+    public void local() {
+        LongPredicate predicate = null;
+    }
+
     @Test
     public void method_call() {
-        Objects.equals(1, 2);
+        Objects.equals(1, 1);
     }
 
     @Test
@@ -59,7 +74,7 @@ public class BackportBaseTest {
                 result[0] = s + s2;
             }
         }.accept("1", "2");
-        
+
         assertEquals("12", result[0]);
     }
 
@@ -81,7 +96,7 @@ public class BackportBaseTest {
                 return operand + 1;
             }
         });
-        
+
         assertEquals(2, f.applyAsDouble(1), 0);
     }
 
@@ -98,7 +113,7 @@ public class BackportBaseTest {
                 return s + "3";
             }
         });
-        
+
         assertEquals("123", f.apply("1"));
     }
 

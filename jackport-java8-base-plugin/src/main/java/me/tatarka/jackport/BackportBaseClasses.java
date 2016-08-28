@@ -8,6 +8,8 @@ import com.android.jack.ir.ast.JClassOrInterface;
 import com.android.jack.ir.ast.JDefinedClass;
 import com.android.jack.ir.ast.JDefinedClassOrInterface;
 import com.android.jack.ir.ast.JDefinedInterface;
+import com.android.jack.ir.ast.JField;
+import com.android.jack.ir.ast.JFieldInitializer;
 import com.android.jack.ir.ast.JInterface;
 import com.android.jack.ir.ast.JLambda;
 import com.android.jack.ir.ast.JMethod;
@@ -70,6 +72,14 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
                     }
                 }
                 return super.visit(type);
+            }
+
+            @Override
+            public boolean visit(@Nonnull JField field) {
+                if (checkType(field.getType()) == Type.NEW) {
+                    tr.append(new ChangePackage((JClassOrInterface) field.getType()));
+                }
+                return super.visit(field);
             }
 
             @Override
