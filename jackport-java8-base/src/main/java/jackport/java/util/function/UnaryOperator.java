@@ -41,24 +41,21 @@ import jackport.java.lang.FunctionalInterface;
 @FunctionalInterface
 public interface UnaryOperator<T> extends Function<T, T> {
 
-    abstract class $<T> extends Function.$<T, T> implements UnaryOperator<T> {
-
-        private static final UnaryOperator IDENTITY = new UnaryOperator.$() {
-            @Override
-            public Object apply(Object t) {
-                return t;
-            }
-        };
-
-        /**
-         * Returns a unary operator that always returns its input argument.
-         *
-         * @param <T> the type of the input and output of the operator
-         * @return a unary operator that always returns its input argument
-         */
-        @SuppressWarnings("unchecked")
-        public static <T> UnaryOperator<T> identity() {
-            return IDENTITY;
+    UnaryOperator IDENTITY = new UnaryOperator() {
+        @Override
+        public Object apply(Object t) {
+            return t;
         }
+    };
+
+    /**
+     * Returns a unary operator that always returns its input argument.
+     *
+     * @param <T> the type of the input and output of the operator
+     * @return a unary operator that always returns its input argument
+     */
+    @SuppressWarnings("unchecked")
+    static <T> UnaryOperator<T> identity() {
+        return IDENTITY;
     }
 }

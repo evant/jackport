@@ -61,24 +61,14 @@ public interface DoubleConsumer {
      * operation followed by the {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
-    DoubleConsumer andThen(DoubleConsumer after);
-
-    abstract class $ implements DoubleConsumer {
-
-        @Override
-        public DoubleConsumer andThen(DoubleConsumer after) {
-            return $.andThen(this, after);
-        }
-
-        public static DoubleConsumer andThen(final DoubleConsumer $this, final DoubleConsumer after) {
-            Objects.requireNonNull(after);
-            return new $() {
-                @Override
-                public void accept(double t) {
-                    $this.accept(t);
-                    after.accept(t);
-                }
-            };
-        }
+    default DoubleConsumer andThen(DoubleConsumer after) {
+        Objects.requireNonNull(after);
+        return new DoubleConsumer() {
+            @Override
+            public void accept(double t) {
+                DoubleConsumer.this.accept(t);
+                after.accept(t);
+            }
+        };
     }
 }

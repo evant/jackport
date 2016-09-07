@@ -66,7 +66,15 @@ public interface DoublePredicate {
      * AND of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    DoublePredicate and(DoublePredicate other);
+    default DoublePredicate and(DoublePredicate other) {
+        Objects.requireNonNull(other);
+        return new DoublePredicate() {
+            @Override
+            public boolean test(double value) {
+                return DoublePredicate.this.test(value) && other.test(value);
+            }
+        };
+    }
 
     /**
      * Returns a predicate that represents the logical negation of this
@@ -75,7 +83,14 @@ public interface DoublePredicate {
      * @return a predicate that represents the logical negation of this
      * predicate
      */
-    DoublePredicate negate();
+    default DoublePredicate negate() {
+        return new DoublePredicate() {
+            @Override
+            public boolean test(double value) {
+                return !DoublePredicate.this.test(value);
+            }
+        };
+    }
 
     /**
      * Returns a composed predicate that represents a short-circuiting logical
@@ -93,52 +108,13 @@ public interface DoublePredicate {
      * OR of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    DoublePredicate or(DoublePredicate other);
-
-    abstract class $ implements DoublePredicate {
-
-        @Override
-        public DoublePredicate and(DoublePredicate other) {
-            return $.and(this, other);
-        }
-
-        @Override
-        public DoublePredicate negate() {
-            return $.negate(this);
-        }
-
-        @Override
-        public DoublePredicate or(DoublePredicate other) {
-            return $.or(this, other);
-        }
-
-        public static DoublePredicate and(final DoublePredicate $this, final DoublePredicate other) {
-            Objects.requireNonNull(other);
-            return new $() {
-                @Override
-                public boolean test(double value) {
-                    return $this.test(value) && other.test(value);
-                }
-            };
-        }
-
-        public static DoublePredicate negate(final DoublePredicate $this) {
-            return new $() {
-                @Override
-                public boolean test(double value) {
-                    return !$this.test(value);
-                }
-            };
-        }
-
-        public static DoublePredicate or(final DoublePredicate $this, final DoublePredicate other) {
-            Objects.requireNonNull(other);
-            return new $() {
-                @Override
-                public boolean test(double value) {
-                    return $this.test(value) || other.test(value);
-                }
-            };
-        }
+    default DoublePredicate or(DoublePredicate other) {
+        Objects.requireNonNull(other);
+        return new DoublePredicate() {
+            @Override
+            public boolean test(double value) {
+                return DoublePredicate.this.test(value) || other.test(value);
+            }
+        };
     }
 }

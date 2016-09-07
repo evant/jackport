@@ -61,24 +61,14 @@ public interface LongConsumer {
      * operation followed by the {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
-    LongConsumer andThen(LongConsumer after);
-
-    abstract class $ implements LongConsumer {
-
-        @Override
-        public LongConsumer andThen(LongConsumer after) {
-            return $.andThen(this, after);
-        }
-
-        public static LongConsumer andThen(final LongConsumer $this, final LongConsumer after) {
-            Objects.requireNonNull(after);
-            return new $() {
-                @Override
-                public void accept(long t) {
-                    $this.accept(t);
-                    after.accept(t);
-                }
-            };
-        }
+    default LongConsumer andThen(LongConsumer after) {
+        Objects.requireNonNull(after);
+        return new LongConsumer() {
+            @Override
+            public void accept(long t) {
+                LongConsumer.this.accept(t);
+                after.accept(t);
+            }
+        };
     }
 }

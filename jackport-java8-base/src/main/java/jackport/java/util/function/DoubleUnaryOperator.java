@@ -61,7 +61,15 @@ public interface DoubleUnaryOperator {
      * @throws NullPointerException if before is null
      * @see #andThen(DoubleUnaryOperator)
      */
-    DoubleUnaryOperator compose(DoubleUnaryOperator before);
+    default DoubleUnaryOperator compose(DoubleUnaryOperator before) {
+        Objects.requireNonNull(before);
+        return new DoubleUnaryOperator() {
+            @Override
+            public double applyAsDouble(double v) {
+                return DoubleUnaryOperator.this.applyAsDouble(before.applyAsDouble(v));
+            }
+        };
+    }
 
     /**
      * Returns a composed operator that first applies this operator to
@@ -75,54 +83,29 @@ public interface DoubleUnaryOperator {
      * @throws NullPointerException if after is null
      * @see #compose(DoubleUnaryOperator)
      */
-    DoubleUnaryOperator andThen(DoubleUnaryOperator after);
-
-    abstract class $ implements DoubleUnaryOperator {
-
-        private static final DoubleUnaryOperator IDENTITY = new $() {
+    default DoubleUnaryOperator andThen(DoubleUnaryOperator after) {
+        Objects.requireNonNull(after);
+        return new DoubleUnaryOperator() {
             @Override
-            public double applyAsDouble(double operand) {
-                return operand;
+            public double applyAsDouble(double t) {
+                return after.applyAsDouble(DoubleUnaryOperator.this.applyAsDouble(t));
             }
         };
+    }
 
+    DoubleUnaryOperator IDENTITY = new DoubleUnaryOperator() {
         @Override
-        public DoubleUnaryOperator compose(DoubleUnaryOperator before) {
-            return $.compose(this, before);
+        public double applyAsDouble(double operand) {
+            return operand;
         }
+    };
 
-        @Override
-        public DoubleUnaryOperator andThen(DoubleUnaryOperator after) {
-            return $.andThen(this, after);
-        }
-
-        public static DoubleUnaryOperator compose(final DoubleUnaryOperator $this, final DoubleUnaryOperator before) {
-            Objects.requireNonNull(before);
-            return new $() {
-                @Override
-                public double applyAsDouble(double v) {
-                    return $this.applyAsDouble(before.applyAsDouble(v));
-                }
-            };
-        }
-
-        public static DoubleUnaryOperator andThen(final DoubleUnaryOperator $this, final DoubleUnaryOperator after) {
-            Objects.requireNonNull(after);
-            return new $() {
-                @Override
-                public double applyAsDouble(double t) {
-                    return after.applyAsDouble($this.applyAsDouble(t));
-                }
-            };
-        }
-
-        /**
-         * Returns a unary operator that always returns its input argument.
-         *
-         * @return a unary operator that always returns its input argument
-         */
-        public static DoubleUnaryOperator identity() {
-            return IDENTITY;
-        }
+    /**
+     * Returns a unary operator that always returns its input argument.
+     *
+     * @return a unary operator that always returns its input argument
+     */
+    static DoubleUnaryOperator identity() {
+        return IDENTITY;
     }
 }

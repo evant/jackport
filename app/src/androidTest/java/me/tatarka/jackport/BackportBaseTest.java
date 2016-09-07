@@ -9,18 +9,14 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.function.IntSupplier;
 import java.util.function.IntToLongFunction;
-import java.util.function.IntUnaryOperator;
 import java.util.function.LongPredicate;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+// 2
 /**
  * Test different ways to access classes that are backported. Note: since a single backport will
  * effect all usages, each one of these tests <em>must</em> use a different class.
@@ -78,44 +74,44 @@ public class BackportBaseTest {
         assertEquals("12", result[0]);
     }
 
-    @Test
-    public void new_lambda() {
-        IntSupplier s = () -> 0;
-    }
-
-    @Test
-    public void static_method_in_interface() {
-        IntUnaryOperator ident = IntUnaryOperator.identity();
-    }
-
-    @Test
-    public void call_default_method_on_instance() {
-        DoubleUnaryOperator f = DoubleUnaryOperator.identity().andThen(new DoubleUnaryOperator() {
-            @Override
-            public double applyAsDouble(double operand) {
-                return operand + 1;
-            }
-        });
-
-        assertEquals(2, f.applyAsDouble(1), 0);
-    }
-
-    @Test
-    public void call_default_method_on_subclass() {
-        Function<String, String> f = new Function<String, String>() {
-            @Override
-            public String apply(String s) {
-                return s + "2";
-            }
-        }.andThen(new Function<String, String>() {
-            @Override
-            public String apply(String s) {
-                return s + "3";
-            }
-        });
-
-        assertEquals("123", f.apply("1"));
-    }
+//    @Test
+//    public void new_lambda() {
+//        IntSupplier s = () -> 0;
+//    }
+//
+//    @Test
+//    public void static_method_in_interface() {
+//        IntUnaryOperator ident = IntUnaryOperator.identity();
+//    }
+//
+//    @Test
+//    public void call_default_method_on_instance() {
+//        DoubleUnaryOperator f = DoubleUnaryOperator.identity().andThen(new DoubleUnaryOperator() {
+//            @Override
+//            public double applyAsDouble(double operand) {
+//                return operand + 1;
+//            }
+//        });
+//
+//        assertEquals(2, f.applyAsDouble(1), 0);
+//    }
+//
+//    @Test
+//    public void call_default_method_on_subclass() {
+//        Function<String, String> f = new Function<String, String>() {
+//            @Override
+//            public String apply(String s) {
+//                return s + "2";
+//            }
+//        }.andThen(new Function<String, String>() {
+//            @Override
+//            public String apply(String s) {
+//                return s + "3";
+//            }
+//        });
+//
+//        assertEquals("123", f.apply("1"));
+//    }
 
     private static Supplier<String> getSupplier() {
         return null;
@@ -124,10 +120,4 @@ public class BackportBaseTest {
     private static void takeBiPredicate(BiPredicate<String, String> pr) {
     }
 
-    private static class MyPredicate implements Predicate<String> {
-        @Override
-        public boolean test(String s) {
-            return true;
-        }
-    }
 }

@@ -46,51 +46,43 @@ import jackport.java.util.Objects;
 @FunctionalInterface
 public interface BinaryOperator<T> extends BiFunction<T, T, T> {
 
-    abstract class $<T> implements BinaryOperator<T> {
+    /**
+     * Returns a {@link BinaryOperator} which returns the lesser of two elements
+     * according to the specified {@code Comparator}.
+     *
+     * @param <T>        the type of the input arguments of the comparator
+     * @param comparator a {@code Comparator} for comparing the two values
+     * @return a {@code BinaryOperator} which returns the lesser of its operands,
+     * according to the supplied {@code Comparator}
+     * @throws NullPointerException if the argument is null
+     */
+    static <T> BinaryOperator<T> minBy(final Comparator<? super T> comparator) {
+        Objects.requireNonNull(comparator);
+        return new BinaryOperator<T>() {
+            @Override
+            public T apply(T a, T b) {
+                return comparator.compare(a, b) <= 0 ? a : b;
+            }
+        };
+    }
 
-        @Override
-        public <V> BiFunction<T, T, V> andThen(Function<? super T, ? extends V> after) {
-            return BiFunction.$.andThen(this, after);
-        }
-
-        /**
-         * Returns a {@link BinaryOperator} which returns the lesser of two elements
-         * according to the specified {@code Comparator}.
-         *
-         * @param <T>        the type of the input arguments of the comparator
-         * @param comparator a {@code Comparator} for comparing the two values
-         * @return a {@code BinaryOperator} which returns the lesser of its operands,
-         * according to the supplied {@code Comparator}
-         * @throws NullPointerException if the argument is null
-         */
-        public static <T> BinaryOperator<T> minBy(final Comparator<? super T> comparator) {
-            Objects.requireNonNull(comparator);
-            return new $<T>() {
-                @Override
-                public T apply(T a, T b) {
-                    return comparator.compare(a, b) <= 0 ? a : b;
-                }
-            };
-        }
-
-        /**
-         * Returns a {@link BinaryOperator} which returns the greater of two elements
-         * according to the specified {@code Comparator}.
-         *
-         * @param <T>        the type of the input arguments of the comparator
-         * @param comparator a {@code Comparator} for comparing the two values
-         * @return a {@code BinaryOperator} which returns the greater of its operands,
-         * according to the supplied {@code Comparator}
-         * @throws NullPointerException if the argument is null
-         */
-        public static <T> BinaryOperator<T> maxBy(final Comparator<? super T> comparator) {
-            Objects.requireNonNull(comparator);
-            return new $<T>() {
-                @Override
-                public T apply(T a, T b) {
-                    return comparator.compare(a, b) >= 0 ? a : b;
-                }
-            };
-        }
+    /**
+     * Returns a {@link BinaryOperator} which returns the greater of two elements
+     * according to the specified {@code Comparator}.
+     *
+     * @param <T>        the type of the input arguments of the comparator
+     * @param comparator a {@code Comparator} for comparing the two values
+     * @return a {@code BinaryOperator} which returns the greater of its operands,
+     * according to the supplied {@code Comparator}
+     * @throws NullPointerException if the argument is null
+     */
+    static <T> BinaryOperator<T> maxBy(final Comparator<? super T> comparator) {
+        Objects.requireNonNull(comparator);
+        return new BinaryOperator<T>() {
+            @Override
+            public T apply(T a, T b) {
+                return comparator.compare(a, b) >= 0 ? a : b;
+            }
+        };
     }
 }

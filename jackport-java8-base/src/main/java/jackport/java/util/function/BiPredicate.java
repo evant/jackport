@@ -67,7 +67,15 @@ public interface BiPredicate<T, U> {
      * AND of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    BiPredicate<T, U> and(BiPredicate<? super T, ? super U> other);
+    default BiPredicate<T, U> and(BiPredicate<? super T, ? super U> other) {
+        Objects.requireNonNull(other);
+        return new BiPredicate<T, U>() {
+            @Override
+            public boolean test(T t, U u) {
+                return BiPredicate.this.test(t, u) && other.test(t, u);
+            }
+        };
+    }
 
     /**
      * Returns a predicate that represents the logical negation of this
@@ -76,7 +84,14 @@ public interface BiPredicate<T, U> {
      * @return a predicate that represents the logical negation of this
      * predicate
      */
-    BiPredicate<T, U> negate();
+    default BiPredicate<T, U> negate() {
+        return new BiPredicate<T, U>() {
+            @Override
+            public boolean test(T t, U u) {
+                return !BiPredicate.this.test(t, u);
+            }
+        };
+    }
 
     /**
      * Returns a composed predicate that represents a short-circuiting logical
@@ -94,52 +109,13 @@ public interface BiPredicate<T, U> {
      * OR of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    BiPredicate<T, U> or(BiPredicate<? super T, ? super U> other);
-
-    abstract class $<T, U> implements BiPredicate<T, U> {
-
-        @Override
-        public BiPredicate<T, U> and(BiPredicate<? super T, ? super U> other) {
-            return $.and(this, other);
-        }
-
-        @Override
-        public BiPredicate<T, U> negate() {
-            return $.negate(this);
-        }
-
-        @Override
-        public BiPredicate<T, U> or(BiPredicate<? super T, ? super U> other) {
-            return $.or(this, other);
-        }
-
-        public static <T, U> BiPredicate<T, U> and(final BiPredicate<T, U> $this, final BiPredicate<? super T, ? super U> other) {
-            Objects.requireNonNull(other);
-            return new $<T, U>() {
-                @Override
-                public boolean test(T t, U u) {
-                    return $this.test(t, u) && other.test(t, u);
-                }
-            };
-        }
-
-        public static <T, U> BiPredicate<T, U> negate(final BiPredicate<T, U> $this) {
-            return new $<T, U>() {
-                @Override
-                public boolean test(T t, U u) {
-                    return !$this.test(t, u);
-                }
-            };
-        }
-
-        public static <T, U> BiPredicate<T, U> or(final BiPredicate<T, U> $this, final BiPredicate<? super T, ? super U> other) {
-            Objects.requireNonNull(other);
-            return new $<T, U>() {
-                @Override
-                public boolean test(T t, U u) {
-                    return $this.test(t, u) || other.test(t, u);
-                }
-            };
-        }
+    default BiPredicate<T, U> or(BiPredicate<? super T, ? super U> other) {
+        Objects.requireNonNull(other);
+        return new BiPredicate<T, U>() {
+            @Override
+            public boolean test(T t, U u) {
+                return BiPredicate.this.test(t, u) || other.test(t, u);
+            }
+        };
     }
 }

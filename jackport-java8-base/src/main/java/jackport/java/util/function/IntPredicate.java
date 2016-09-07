@@ -66,7 +66,15 @@ public interface IntPredicate {
      * AND of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    IntPredicate and(IntPredicate other);
+    default IntPredicate and(IntPredicate other) {
+        Objects.requireNonNull(other);
+        return new IntPredicate() {
+            @Override
+            public boolean test(int value) {
+                return IntPredicate.this.test(value) && other.test(value);
+            }
+        };
+    }
 
     /**
      * Returns a predicate that represents the logical negation of this
@@ -75,7 +83,14 @@ public interface IntPredicate {
      * @return a predicate that represents the logical negation of this
      * predicate
      */
-    IntPredicate negate();
+    default IntPredicate negate() {
+        return new IntPredicate() {
+            @Override
+            public boolean test(int value) {
+                return !IntPredicate.this.test(value);
+            }
+        };
+    }
 
     /**
      * Returns a composed predicate that represents a short-circuiting logical
@@ -93,52 +108,13 @@ public interface IntPredicate {
      * OR of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    IntPredicate or(IntPredicate other);
-
-    abstract class $ implements IntPredicate {
-
-        @Override
-        public IntPredicate and(IntPredicate other) {
-            return $.and(this, other);
-        }
-
-        @Override
-        public IntPredicate negate() {
-            return $.negate(this);
-        }
-
-        @Override
-        public IntPredicate or(IntPredicate other) {
-            return $.or(this, other);
-        }
-
-        public static IntPredicate and(final IntPredicate $this, final IntPredicate other) {
-            Objects.requireNonNull(other);
-            return new $() {
-                @Override
-                public boolean test(int value) {
-                    return $this.test(value) && other.test(value);
-                }
-            };
-        }
-
-        public static IntPredicate negate(final IntPredicate $this) {
-            return new $() {
-                @Override
-                public boolean test(int value) {
-                    return !$this.test(value);
-                }
-            };
-        }
-
-        public static IntPredicate or(final IntPredicate $this, final IntPredicate other) {
-            Objects.requireNonNull(other);
-            return new $() {
-                @Override
-                public boolean test(int value) {
-                    return $this.test(value) || other.test(value);
-                }
-            };
-        }
+    default IntPredicate or(IntPredicate other) {
+        Objects.requireNonNull(other);
+        return new IntPredicate() {
+            @Override
+            public boolean test(int value) {
+                return IntPredicate.this.test(value) || other.test(value);
+            }
+        };
     }
 }

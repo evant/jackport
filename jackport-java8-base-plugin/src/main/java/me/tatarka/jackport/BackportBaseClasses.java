@@ -9,7 +9,6 @@ import com.android.jack.ir.ast.JDefinedClass;
 import com.android.jack.ir.ast.JDefinedClassOrInterface;
 import com.android.jack.ir.ast.JDefinedInterface;
 import com.android.jack.ir.ast.JField;
-import com.android.jack.ir.ast.JFieldInitializer;
 import com.android.jack.ir.ast.JInterface;
 import com.android.jack.ir.ast.JLambda;
 import com.android.jack.ir.ast.JMethod;
@@ -20,18 +19,18 @@ import com.android.jack.ir.ast.JMethodIdWide;
 import com.android.jack.ir.ast.JPackage;
 import com.android.jack.ir.ast.JParameter;
 import com.android.jack.ir.ast.JPhantomClass;
+import com.android.jack.ir.ast.JPrimitiveType;
 import com.android.jack.ir.ast.JReturnStatement;
+import com.android.jack.ir.ast.JStatement;
 import com.android.jack.ir.ast.JType;
 import com.android.jack.ir.ast.JVisitor;
 import com.android.jack.ir.ast.MethodKind;
 import com.android.jack.ir.sourceinfo.SourceInfo;
-import com.android.jack.lookup.JLookup;
-import com.android.jack.lookup.JNodeLookup;
 import com.android.jack.transformations.request.TransformationRequest;
 import com.android.jack.transformations.request.TransformationStep;
 import com.android.sched.item.Description;
-import com.android.sched.schedulable.Produce;
 import com.android.sched.schedulable.RunnableSchedulable;
+import com.android.sched.schedulable.Support;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,21 +39,31 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 @Description("Backports base java 8 api methods")
-@Produce(BackportJava8Api.class)
+@Support(BackportJava8Api.class)
 public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrInterface> {
 
     private static String[][] CLASSES = classes(
             "java.lang.FunctionalInterface",
+            "java.util.function.*",
             "java.util.Objects",
-            "java.util.function.*"
+            "java.util.Optional",
+            "java.util.OptionalInt",
+            "java.util.OptionalLong",
+            "java.util.OptionalDouble",
+            "java.util.Iterator",
+            "java.util.PrimativeIterator",
+            "java.util.Spilterator",
+            "java.util.Spilterators",
+            "java.util.StringJoiner",
+            "java.util.IntSummaryStatistics",
+            "java.util.LongSummaryStatistics",
+            "java.util.DoubleSummaryStatistics"
     );
 
     private ArrayList<String> seen = new ArrayList<>();
-    private JLookup lookup;
 
     @Override
     public void run(@Nonnull final JDefinedClassOrInterface type) {
-        lookup = new JNodeLookup(new JPackage("", null));
         final TransformationRequest tr = new TransformationRequest(type);
         type.traverse(new JVisitor() {
             @Override
@@ -172,7 +181,7 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
         }
         return false;
     }
-    
+
     private static JPackage withJackport(JPackage jPackage) {
         if (jPackage.isTopLevelPackage()) {
             return new JPackage("jackport", jPackage);
@@ -235,11 +244,12 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
 //            if (className(superclass).equals("java.lang.Object")) {
 //                insertBySubclass();
 //            } else {
-                insertByMethodGeneration();
+            insertByMethodGeneration();
 //            }
         }
 
         private void insertBySubclass() {
+            // TODO: figure out why this isn't working.
             JClass superclass = new JPhantomClass(interfaceType.getName() + "$$", interfaceType.getEnclosingPackage());
             type.setSuperClass(superclass);
             type.remove(interfaceType);
@@ -275,7 +285,12 @@ public class BackportBaseClasses implements RunnableSchedulable<JDefinedClassOrI
                         for (JParameter param : params) {
                             call.addArg(param.makeRef(SourceInfo.UNKNOWN));
                         }
-                        JReturnStatement statement = new JReturnStatement(SourceInfo.UNKNOWN, call);
+                        JStatement statement;
+                        if (method.getType() instanceof JPrimitiveType.JVoidType) {
+                            statement = call.makeStatement();
+                        } else {
+                            statement = new JReturnStatement(SourceInfo.UNKNOWN, call);
+                        }
                         block.addStmt(statement);
                         newMethod.setBody(methodBody);
                         type.addMethod(newMethod);

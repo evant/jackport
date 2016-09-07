@@ -44,7 +44,8 @@ public final class Objects {
 
     /**
      * Returns {@code true} if the arguments are equal to each other and {@code false} otherwise.
-     * Consequently, if both arguments are {@code null}, {@code true} is returned and if exactly one
+     * Consequently, if both arguments are {@code null}, {@code true} is returned and if exactly
+     * one
      * argument is {@code null}, {@code false} is returned.  Otherwise, equality is determined by
      * using the {@link Object#equals equals} method of the first argument.
      *
@@ -108,7 +109,8 @@ public final class Objects {
      * }
      * </pre></blockquote>
      * <p>
-     * <b>Warning: When a single object reference is supplied, the returned value does not equal the
+     * <b>Warning: When a single object reference is supplied, the returned value does not equal
+     * the
      * hash code of that object reference.</b> This value can be computed by calling {@link
      * #hashCode(Object)}.
      *
@@ -136,7 +138,8 @@ public final class Objects {
     }
 
     /**
-     * Returns the result of calling {@code toString} on the first argument if the first argument is
+     * Returns the result of calling {@code toString} on the first argument if the first argument
+     * is
      * not {@code null} and returns the second argument otherwise.
      *
      * @param o           an object
@@ -150,7 +153,8 @@ public final class Objects {
     }
 
     /**
-     * Returns 0 if the arguments are identical and {@code c.compare(a, b)} otherwise. Consequently,
+     * Returns 0 if the arguments are identical and {@code c.compare(a, b)} otherwise.
+     * Consequently,
      * if both arguments are {@code null} 0 is returned.
      * <p>
      * <p>Note that if one of the arguments is {@code null}, a {@code NullPointerException} may or
@@ -190,7 +194,8 @@ public final class Objects {
     }
 
     /**
-     * Checks that the specified object reference is not {@code null} and throws a customized {@link
+     * Checks that the specified object reference is not {@code null} and throws a customized
+     * {@link
      * NullPointerException} if it is. This method is designed primarily for doing parameter
      * validation in methods and constructors with multiple parameters, as demonstrated below:
      * <blockquote><pre>
@@ -244,13 +249,15 @@ public final class Objects {
     }
 
     /**
-     * Checks that the specified object reference is not {@code null} and throws a customized {@link
+     * Checks that the specified object reference is not {@code null} and throws a customized
+     * {@link
      * NullPointerException} if it is.
      * <p>
      * <p>Unlike the method {@link #requireNonNull(Object, String)}, this method allows creation of
      * the message to be deferred until after the null check is made. While this may confer a
      * performance advantage in the non-null case, when deciding to call this method care should be
-     * taken that the costs of creating the message supplier are less than the cost of just creating
+     * taken that the costs of creating the message supplier are less than the cost of just
+     * creating
      * the string message directly.
      *
      * @param obj             the object reference to check for nullity

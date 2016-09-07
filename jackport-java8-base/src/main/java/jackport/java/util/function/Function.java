@@ -62,7 +62,15 @@ public interface Function<T, R> {
      * @throws NullPointerException if before is null
      * @see #andThen(Function)
      */
-    <V> Function<V, R> compose(Function<? super V, ? extends T> before);
+    default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+        Objects.requireNonNull(before);
+        return new Function<V, R>() {
+            @Override
+            public R apply(V v) {
+                return Function.this.apply(before.apply(v));
+            }
+        };
+    }
 
     /**
      * Returns a composed function that first applies this function to
@@ -78,56 +86,32 @@ public interface Function<T, R> {
      * @throws NullPointerException if after is null
      * @see #compose(Function)
      */
-    <V> Function<T, V> andThen(Function<? super R, ? extends V> after);
-
-    abstract class $<T, R> implements Function<T, R> {
-
-        static final Function IDENTITY = new $() {
+    default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+        Objects.requireNonNull(after);
+        return new Function<T, V>() {
             @Override
-            public Object apply(Object t) {
-                return t;
+            public V apply(T t) {
+                return after.apply(Function.this.apply(t));
             }
         };
+    }
 
+    Function IDENTITY = new Function() {
         @Override
-        public <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
-            return $.compose(this, before);
+        public Object apply(Object t) {
+            return t;
         }
+    };
 
-        @Override
-        public <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
-            return $.andThen(this, after);
-        }
 
-        public static <T, R, V> Function<V, R> compose(final Function<T, R> $this, final Function<? super V, ? extends T> before) {
-            Objects.requireNonNull(before);
-            return new $<V, R>() {
-                @Override
-                public R apply(V v) {
-                    return $this.apply(before.apply(v));
-                }
-            };
-        }
-
-        public static <T, R, V> Function<T, V> andThen(final Function<T, R> $this, final Function<? super R, ? extends V> after) {
-            Objects.requireNonNull(after);
-            return new $<T, V>() {
-                @Override
-                public V apply(T t) {
-                    return after.apply($this.apply(t));
-                }
-            };
-        }
-
-        /**
-         * Returns a function that always returns its input argument.
-         *
-         * @param <T> the type of the input and output objects to the function
-         * @return a function that always returns its input argument
-         */
-        @SuppressWarnings("unchecked")
-        public static <T> Function<T, T> identity() {
-            return IDENTITY;
-        }
+    /**
+     * Returns a function that always returns its input argument.
+     *
+     * @param <T> the type of the input and output objects to the function
+     * @return a function that always returns its input argument
+     */
+    @SuppressWarnings("unchecked")
+    static <T> Function<T, T> identity() {
+        return IDENTITY;
     }
 }

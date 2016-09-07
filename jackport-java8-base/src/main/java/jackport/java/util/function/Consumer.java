@@ -36,12 +36,11 @@ import jackport.java.util.Objects;
  * whose functional method is {@link #accept(Object)}.
  *
  * @param <T> the type of the input to the operation
- *
  * @since 1.8
  */
 @FunctionalInterface
 public interface Consumer<T> {
-    
+
     /**
      * Performs this operation on the given argument.
      *
@@ -61,24 +60,14 @@ public interface Consumer<T> {
      * operation followed by the {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
-    Consumer<T> andThen(Consumer<? super T> after);
-    
-    abstract class $<T> implements Consumer<T> {
-
-        @Override
-        public Consumer<T> andThen(Consumer<? super T> after) {
-            return $.andThen(this, after);
-        }
-
-        public static <T> Consumer<T> andThen(final Consumer<T> $this, final Consumer<? super T> after) {
-            Objects.requireNonNull(after);
-            return new $<T>() {
-                @Override
-                public void accept(T t) {
-                    $this.accept(t);
-                    after.accept(t);
-                }
-            };
-        }
+    default Consumer<T> andThen(Consumer<? super T> after) {
+        Objects.requireNonNull(after);
+        return new Consumer<T>() {
+            @Override
+            public void accept(T t) {
+                Consumer.this.accept(t);
+                after.accept(t);
+            }
+        };
     }
 }

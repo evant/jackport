@@ -63,24 +63,14 @@ public interface BiConsumer<T, U> {
      * operation followed by the {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
-    BiConsumer<T, U> andThen(BiConsumer<? super T, ? super U> after);
-
-    abstract class $<T, U> implements BiConsumer<T, U> {
-
-        @Override
-        public BiConsumer<T, U> andThen(BiConsumer<? super T, ? super U> after) {
-            return $.andThen(this, after);
-        }
-
-        public static <T, U> BiConsumer<T, U> andThen(final BiConsumer<T, U> $this, final BiConsumer<? super T, ? super U> after) {
-            Objects.requireNonNull(after);
-            return new $<T, U>() {
-                @Override
-                public void accept(T l, U r) {
-                    $this.accept(l, r);
-                    after.accept(l, r);
-                }
-            };
-        }
+    default BiConsumer<T, U> andThen(BiConsumer<? super T, ? super U> after) {
+        Objects.requireNonNull(after);
+        return new BiConsumer<T, U>() {
+            @Override
+            public void accept(T l, U r) {
+                BiConsumer.this.accept(l, r);
+                after.accept(l, r);
+            }
+        };
     }
 }

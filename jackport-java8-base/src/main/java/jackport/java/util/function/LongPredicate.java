@@ -65,7 +65,15 @@ public interface LongPredicate {
      * AND of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    LongPredicate and(LongPredicate other);
+    default LongPredicate and(LongPredicate other) {
+        Objects.requireNonNull(other);
+        return new LongPredicate() {
+            @Override
+            public boolean test(long value) {
+                return LongPredicate.this.test(value) && other.test(value);
+            }
+        };
+    }
 
     /**
      * Returns a predicate that represents the logical negation of this
@@ -74,7 +82,14 @@ public interface LongPredicate {
      * @return a predicate that represents the logical negation of this
      * predicate
      */
-    LongPredicate negate();
+    default LongPredicate negate() {
+        return new LongPredicate() {
+            @Override
+            public boolean test(long value) {
+                return !LongPredicate.this.test(value);
+            }
+        };
+    }
 
     /**
      * Returns a composed predicate that represents a short-circuiting logical
@@ -92,52 +107,13 @@ public interface LongPredicate {
      * OR of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    LongPredicate or(LongPredicate other);
-
-    abstract class $ implements LongPredicate {
-
-        @Override
-        public LongPredicate and(LongPredicate other) {
-            return $.and(this, other);
-        }
-
-        @Override
-        public LongPredicate negate() {
-            return $.negate(this);
-        }
-
-        @Override
-        public LongPredicate or(LongPredicate other) {
-            return $.or(this, other);
-        }
-
-        public static LongPredicate and(final LongPredicate $this, final LongPredicate other) {
-            Objects.requireNonNull(other);
-            return new $() {
-                @Override
-                public boolean test(long value) {
-                    return $this.test(value) && other.test(value);
-                }
-            };
-        }
-
-        public static LongPredicate negate(final LongPredicate $this) {
-            return new $() {
-                @Override
-                public boolean test(long value) {
-                    return !$this.test(value);
-                }
-            };
-        }
-
-        public static LongPredicate or(final LongPredicate $this, final LongPredicate other) {
-            Objects.requireNonNull(other);
-            return new $() {
-                @Override
-                public boolean test(long value) {
-                    return $this.test(value) || other.test(value);
-                }
-            };
-        }
+    default LongPredicate or(LongPredicate other) {
+        Objects.requireNonNull(other);
+        return new LongPredicate() {
+            @Override
+            public boolean test(long value) {
+                return LongPredicate.this.test(value) || other.test(value);
+            }
+        };
     }
 }

@@ -1,1 +1,1 @@
-include ':app', ':jackport-java8-base-plugin', ':jackport-java8-base'
+include ':app', ':jackport-java8-base-plugin', ':jackport-java8-base', ':jackport-default-methods-plugin', ':jackport-default-methods-test'

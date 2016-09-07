@@ -61,7 +61,15 @@ public interface IntUnaryOperator {
      * @throws NullPointerException if before is null
      * @see #andThen(IntUnaryOperator)
      */
-    IntUnaryOperator compose(final IntUnaryOperator before);
+    default IntUnaryOperator compose(final IntUnaryOperator before) {
+        Objects.requireNonNull(before);
+        return new IntUnaryOperator() {
+            @Override
+            public int applyAsInt(int v) {
+                return IntUnaryOperator.this.applyAsInt(before.applyAsInt(v));
+            }
+        };
+    }
 
     /**
      * Returns a composed operator that first applies this operator to
@@ -75,54 +83,29 @@ public interface IntUnaryOperator {
      * @throws NullPointerException if after is null
      * @see #compose(IntUnaryOperator)
      */
-    IntUnaryOperator andThen(final IntUnaryOperator after);
-
-    abstract class $ implements IntUnaryOperator {
-
-        private static final IntUnaryOperator IDENTITY = new $() {
+    default IntUnaryOperator andThen(final IntUnaryOperator after) {
+        Objects.requireNonNull(after);
+        return new IntUnaryOperator() {
             @Override
-            public int applyAsInt(int operand) {
-                return operand;
+            public int applyAsInt(int t) {
+                return after.applyAsInt(IntUnaryOperator.this.applyAsInt(t));
             }
         };
+    }
 
+    IntUnaryOperator IDENTITY = new IntUnaryOperator() {
         @Override
-        public IntUnaryOperator compose(IntUnaryOperator before) {
-            return $.compose(this, before);
+        public int applyAsInt(int operand) {
+            return operand;
         }
+    };
 
-        @Override
-        public IntUnaryOperator andThen(IntUnaryOperator after) {
-            return $.andThen(this, after);
-        }
-
-        public static IntUnaryOperator compose(final IntUnaryOperator $this, final IntUnaryOperator before) {
-            Objects.requireNonNull(before);
-            return new $() {
-                @Override
-                public int applyAsInt(int v) {
-                    return $this.applyAsInt(before.applyAsInt(v));
-                }
-            };
-        }
-
-        public static IntUnaryOperator andThen(final IntUnaryOperator $this, final IntUnaryOperator after) {
-            Objects.requireNonNull(after);
-            return new $() {
-                @Override
-                public int applyAsInt(int t) {
-                    return after.applyAsInt($this.applyAsInt(t));
-                }
-            };
-        }
-
-        /**
-         * Returns a unary operator that always returns its input argument.
-         *
-         * @return a unary operator that always returns its input argument
-         */
-        public static IntUnaryOperator identity() {
-            return IDENTITY;
-        }
+    /**
+     * Returns a unary operator that always returns its input argument.
+     *
+     * @return a unary operator that always returns its input argument
+     */
+    static IntUnaryOperator identity() {
+        return IDENTITY;
     }
 }

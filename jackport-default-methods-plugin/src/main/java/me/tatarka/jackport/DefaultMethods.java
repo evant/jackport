@@ -10,36 +10,38 @@ import com.android.sched.util.SubReleaseKind;
 import com.android.sched.util.Version;
 import com.android.sched.util.config.Config;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class BackportJava8BasePlugin extends SchedAnnotationProcessorBasedPlugin {
+import me.tatarka.jackport.feature.DefaultMethod;
 
+public class DefaultMethods extends SchedAnnotationProcessorBasedPlugin {
     @Nonnull
     @Override
     public String getCanonicalName() {
-        return BackportJava8BasePlugin.class.getCanonicalName();
+        return DefaultMethods.class.getCanonicalName();
     }
 
     @Nonnull
     @Override
     public String getFriendlyName() {
-        return "Backport Base Java8 api";
+        return "backport default methods";
     }
 
     @Nonnull
     @Override
     public String getDescription() {
-        return "Backport Base Java8 api";
+        return "backports default and static methods in interfaces";
     }
 
     @Nonnull
     @Override
     public Version getVersion() {
-        return new Version("jackport-java8-base", "1.0", 1, 0, SubReleaseKind.ENGINEERING);
+        return new Version("jackport-default-methods", "1.0", 1, 0, SubReleaseKind.ENGINEERING);
     }
 
     @Override
@@ -50,22 +52,25 @@ public class BackportJava8BasePlugin extends SchedAnnotationProcessorBasedPlugin
     @Nonnull
     @Override
     public FeatureSet getFeatures(@Nonnull Config config, @Nonnull Scheduler scheduler) {
-        return scheduler.createFeatureSet();
+        FeatureSet featureSet = scheduler.createFeatureSet();
+        featureSet.add(DefaultMethod.class);
+        return featureSet;
     }
 
     @Nonnull
     @Override
     public ProductionSet getProductions(@Nonnull Config config, @Nonnull Scheduler scheduler) {
-        ProductionSet productionSet = scheduler.createProductionSet();
-        productionSet.add(BackportJava8Api.class);
-        return productionSet;
+        return scheduler.createProductionSet();
     }
 
     @Nonnull
     @Override
     public List<Class<? extends RunnableSchedulable<? extends Component>>> getSortedRunners() {
-        return Collections.<Class<? extends RunnableSchedulable<? extends Component>>>
-                singletonList(BackportBaseClasses.class);
+        return Arrays.<Class<? extends RunnableSchedulable<? extends Component>>>asList(
+                DefaultInterfaceDefinedConverter.class,
+                DefaultInterfaceUsageConverter.class,
+                StaticInterfaceMethodUsageConverter.class
+        );
     }
 
     @Nonnull
