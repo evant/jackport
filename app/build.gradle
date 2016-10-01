@@ -6,7 +6,7 @@ configurations {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
     jackPlugin project(':jackport-default-methods-plugin')
     jackPlugin project(':jackport-java8-base-plugin')
@@ -31,8 +31,8 @@ android {
             enabled true
             jackInProcess false
             pluginPath configurations.jackPlugin.files
-            plugin 'me.tatarka.jackport.DefaultMethods'
             plugin 'me.tatarka.jackport.Base'
+            plugin 'me.tatarka.jackport.DefaultMethods'
         }
     }
     buildTypes {

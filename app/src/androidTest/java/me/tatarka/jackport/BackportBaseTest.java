@@ -6,10 +6,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.IntSupplier;
 import java.util.function.IntToLongFunction;
+import java.util.function.IntUnaryOperator;
 import java.util.function.LongPredicate;
 import java.util.function.Supplier;
 
@@ -62,9 +63,9 @@ public class BackportBaseTest {
     }
 
     @Test
-    public void class_new_annonamous_instance() {
+    public void class_new_anonymous_instance() {
         final String[] result = new String[1];
-        new BiConsumer<String, String>() {
+        new java.util.function.BiConsumer<String, String>() {
             @Override
             public void accept(String s, String s2) {
                 result[0] = s + s2;
@@ -74,16 +75,16 @@ public class BackportBaseTest {
         assertEquals("12", result[0]);
     }
 
-//    @Test
-//    public void new_lambda() {
-//        IntSupplier s = () -> 0;
-//    }
-//
+    @Test
+    public void new_lambda() {
+        IntSupplier s = () -> 0;
+    }
+
 //    @Test
 //    public void static_method_in_interface() {
 //        IntUnaryOperator ident = IntUnaryOperator.identity();
 //    }
-//
+
 //    @Test
 //    public void call_default_method_on_instance() {
 //        DoubleUnaryOperator f = DoubleUnaryOperator.identity().andThen(new DoubleUnaryOperator() {

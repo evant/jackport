@@ -1,23 +1,27 @@
 package me.tatarka.jackport;
 
 import com.android.jack.Jack;
-import com.android.jack.ir.ast.JAnnotation;
+import com.android.jack.ir.ast.JBlock;
 import com.android.jack.ir.ast.JClass;
-import com.android.jack.ir.ast.JClassLiteral;
-import com.android.jack.ir.ast.JDefinedAnnotationType;
+import com.android.jack.ir.ast.JConstructor;
 import com.android.jack.ir.ast.JDefinedClass;
 import com.android.jack.ir.ast.JDefinedClassOrInterface;
 import com.android.jack.ir.ast.JDefinedInterface;
+import com.android.jack.ir.ast.JExpression;
+import com.android.jack.ir.ast.JExpressionStatement;
 import com.android.jack.ir.ast.JMethod;
+import com.android.jack.ir.ast.JMethodBody;
+import com.android.jack.ir.ast.JMethodCall;
 import com.android.jack.ir.ast.JMethodId;
 import com.android.jack.ir.ast.JMethodIdWide;
 import com.android.jack.ir.ast.JModifier;
-import com.android.jack.ir.ast.JNameValuePair;
 import com.android.jack.ir.ast.JPackage;
 import com.android.jack.ir.ast.JParameter;
-import com.android.jack.ir.ast.JRetentionPolicy;
+import com.android.jack.ir.ast.JPrimitiveType;
+import com.android.jack.ir.ast.JReturnStatement;
 import com.android.jack.ir.ast.JSession;
-import com.android.jack.ir.ast.JStringLiteral;
+import com.android.jack.ir.ast.JStatement;
+import com.android.jack.ir.ast.JThis;
 import com.android.jack.ir.ast.JType;
 import com.android.jack.ir.ast.JVisitor;
 import com.android.jack.ir.ast.MethodKind;
@@ -26,7 +30,6 @@ import com.android.jack.ir.sourceinfo.SourceInfo;
 import com.android.jack.ir.sourceinfo.SourceInfoFactory;
 import com.android.jack.load.NopClassOrInterfaceLoader;
 import com.android.jack.lookup.JLookup;
-import com.android.jack.transformations.request.AddAnnotation;
 import com.android.jack.transformations.request.AppendMethod;
 import com.android.jack.transformations.request.TransformationRequest;
 import com.android.jack.util.NamingTools;
@@ -39,6 +42,7 @@ import com.android.sched.schedulable.RunnableSchedulable;
 import com.android.sched.schedulable.Transform;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -129,16 +133,20 @@ public class DefaultInterfaceDefinedConverter implements RunnableSchedulable<JDe
             defaultImpl.addMarker(new SimpleName(simpleName));
             defaultImpl.addMarker(new DefaultMethodImpl(simpleName));
 
-//            JAnnotation annotation = new JAnnotation(SourceInfo.UNKNOWN, JRetentionPolicy.CLASS, new JDefinedAnnotationType(
-//                    SourceInfo.UNKNOWN,
-//                    "_jackport_default",
-//                    JModifier.PUBLIC,
-//                    Jack.getSession().getTopLevelPackage(),
-//                    NopClassOrInterfaceLoader.INSTANCE
-//            ));
-//            annotation.put(new JNameValuePair(SourceInfo.UNKNOWN, new JMethodIdWide("", MethodKind.INSTANCE_NON_VIRTUAL), new JStringLiteral(SourceInfo.UNKNOWN, simpleName)));
-//            
-//            tr.append(new AddAnnotation(annotation, definedInterface));
+            int modifiers = definedInterface.getModifier() & (JModifier.PUBLIC | JModifier.PRIVATE);
+            JConstructor constructor = new JConstructor(SourceInfo.UNKNOWN, defaultImpl, modifiers);
+            JBlock block = new JBlock(SourceInfo.UNKNOWN);
+            JMethodIdWide id = defaultImpl.getOrCreateMethodIdWide("<init>", Collections.<JType>emptyList(), MethodKind.INSTANCE_NON_VIRTUAL);
+            JMethodCall call = new JMethodCall(SourceInfo.UNKNOWN, new JThis(constructor).makeRef(SourceInfo.UNKNOWN), object, id, JPrimitiveType.JPrimitiveTypeEnum.VOID.getType(), true);
+            call.addArgs(Collections.<JExpression>emptyList());
+            JStatement stmt = new JExpressionStatement(SourceInfo.UNKNOWN, call);
+            block.addStmt(stmt);
+            JStatement retStmt = new JReturnStatement(SourceInfo.UNKNOWN, null);
+            block.addStmt(retStmt);
+            JMethodBody body = new JMethodBody(SourceInfo.UNKNOWN, block);
+            constructor.setBody(body);
+
+            tr.append(new AppendMethod(defaultImpl, constructor));
 
             for (JMethod method : defaultMethods) {
                 appendMethod(defaultImpl, method);

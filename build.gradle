@@ -5,7 +5,7 @@ buildscript {
         maven { url project.property('android.gradle.plugin.path') }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-alpha3'
+        classpath 'com.android.tools.build:gradle:2.2.0'
     }
 }
 

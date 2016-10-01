@@ -18,7 +18,6 @@ import com.android.jack.ir.sourceinfo.SourceInfo;
 import com.android.jack.load.NopClassOrInterfaceLoader;
 import com.android.jack.lookup.JLookup;
 import com.android.jack.transformations.request.AppendMethod;
-import com.android.jack.transformations.request.ChangeSuperClass;
 import com.android.jack.transformations.request.TransformationRequest;
 import com.android.sched.item.Description;
 import com.android.sched.schedulable.Constraint;
@@ -34,6 +33,7 @@ import javax.annotation.Nonnull;
 import me.tatarka.jackport.filter.ClassFilter;
 import me.tatarka.jackport.marker.DefaultMethodImpl;
 import me.tatarka.jackport.marker.DefaultMethodInterface;
+import me.tatarka.jackport.transform.ChangeSuperClass;
 import me.tatarka.jackport.transform.RemoveImplements;
 import me.tatarka.jackport.util.Util;
 
@@ -59,11 +59,13 @@ public class DefaultInterfaceUsageConverter implements RunnableSchedulable<JDefi
             if (definedClass.containsMarker(DefaultMethodImpl.class)) {
                 return false;
             }
+
             JInterface targetInterface = null;
             DefaultMethodInterface marker = null;
             for (JInterface iface : definedClass.getImplements()) {
                 marker = Util.getMarker(iface, DefaultMethodInterface.class);
                 if (marker != null) {
+                    System.out.println("marker: " + marker.getSimpleName() + " on: " + Util.className(definedClass));
                     targetInterface = iface;
                     break;
                 }
@@ -74,11 +76,14 @@ public class DefaultInterfaceUsageConverter implements RunnableSchedulable<JDefi
                 JClass object = new JDefinedClass(SourceInfo.UNKNOWN, "Object", JModifier.PUBLIC, javaLang, NopClassOrInterfaceLoader.INSTANCE);
                 JDefinedClass defaultClass = marker.lookup(targetInterface);
                 tr.append(new RemoveImplements(definedClass, targetInterface));
-                if (definedClass.getSuperClass().isSameType(object)) {
+
+                if (Util.className(definedClass.getSuperClass()).equals(Util.className(object))) {
+                    System.out.print("easy " + Util.className(definedClass));
                     // Easy, replace the superclass with our abstract impl
                     tr.append(new ChangeSuperClass(definedClass, defaultClass));
                     System.out.println("implements " + Util.className(definedClass.getSuperClass()) + " -> extends " + Util.className(defaultClass));
                 } else {
+                    System.out.println("hard " + Util.className(definedClass));
                     // Harder, copy default impls where they aren't overridden. 
                     for (JMethod defaultMethod : defaultClass.getMethods()) {
                         if (JMethod.isClinit(defaultMethod) || defaultMethod.isStatic()) {

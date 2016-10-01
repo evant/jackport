@@ -10,6 +10,7 @@ import com.android.jack.ir.ast.JMethod;
 import com.android.jack.ir.ast.JMethodCall;
 import com.android.jack.ir.ast.JPackage;
 import com.android.jack.ir.ast.JParameter;
+import com.android.jack.ir.ast.JPhantomClassOrInterface;
 import com.android.jack.ir.ast.JType;
 import com.android.jack.ir.ast.JVariableRef;
 import com.android.jack.ir.ast.JVisitor;
@@ -131,8 +132,14 @@ public class ChangePackageConverter implements RunnableSchedulable<JDefinedClass
 
             @Override
             public boolean visit(@Nonnull JDefinedClassOrInterface type) {
+                if (className(type).contains("BackportBaseTest")) {
+                    System.out.println("visit2: " + className(type));
+                }
                 backport(type.getSuperClass());
                 for (JInterface imp : type.getImplements()) {
+                    if (className(type).contains("BackportBaseTest")) {
+                        System.out.println("imp: " + className(imp));
+                    }
                     backport(imp);
                 }
                 return super.visit(type);
@@ -175,7 +182,7 @@ public class ChangePackageConverter implements RunnableSchedulable<JDefinedClass
                 if (checkType(type)) {
                     JClassOrInterface jType = (JClassOrInterface) type;
                     tr.append(new ChangeEnclosingPackage(jType, withJackport(jType.getEnclosingPackage())));
-                    System.out.println(Util.className(jType) + " -> " + withJackport(jType.getEnclosingPackage()) + "." + type.getName());
+                    System.out.println(Util.className(jType) + " -> " + withJackport(jType.getEnclosingPackage()) + "." + type.getName() + " (" + type.getSourceInfo() + " " + type.getSourceInfo().getFileName() + ")");
                 }
             }
         });

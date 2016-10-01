@@ -5,7 +5,7 @@ configurations {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.1'
     jackPlugin project(':jackport-default-methods-plugin')
 
     testCompile 'junit:junit:4.12'
